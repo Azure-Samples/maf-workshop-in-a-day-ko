@@ -1,13 +1,15 @@
-## [project-title] Changelog
+# Changelog: "**Microsoft Agent Framework Workshop in a Day (KO)**"
 
-<a name="x.y.z"></a>
-# x.y.z (yyyy-mm-dd)
+## x.y.z (yyyy-mm-dd)<a name="x.y.z"></a>
 
-*Features*
-* ...
+**Features**
 
-*Bug Fixes*
-* ...
+- ...
 
-*Breaking Changes*
-* ...
+**Bug Fixes**
+
+- ...
+
+**Breaking Changes**
+
+- ...

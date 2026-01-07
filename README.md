@@ -1,57 +1,22 @@
-# Project Name
+# Microsoft Agent Framework Workshop in a Day (KO)
 
-(short, 1-3 sentenced, description of the project)
+[Microsoft Agent Framework(MAF)](https://aka.ms/agent-framework)를 활용해서 [Copilot Studio](https://learn.microsoft.com/microsoft-copilot-studio/)와 연동해 보는 워크샵 자료입니다.
 
-## Features
+## 사전 준비사항
 
-This project framework provides the following features:
+이 워크샵은 기본적으로 [GitHub Codespaces](https://docs.github.com/codespaces)를 활용해서 진행하기 때문에 아래와 같은 내용만 준비하면 충분합니다.
 
-* Feature 1
-* Feature 2
-* ...
+- 크로미움 계열 웹브라우저 ([Microsoft Edge](https://microsoft.com/edge), [Google Chrome](http://chrome.google.com) 등)
+- [GitHub 개인 계정 (무료)](http://github.com/signup) 👉 업무용 계정일 경우 회사 정책에 따라 오작동할 수가 있으니 반드시 개인 계정으로 준비하세요.
+- [Microsoft Copilot Studio 평가판 구독](https://go.microsoft.com/fwlink/?LinkId=2107702)
 
-## Getting Started
+## 시작하기
 
-### Prerequisites
+이 워크샵은 아래와 같은 내용으로 진행합니다. 모두 자기주도학습의 형태로 진행할 수 있으므로, 워크샵 시간에 다 마치지 못하더라도 끝까지 따라해 보세요.
 
-(ideally very short, if any)
+## 추가 리소스
 
-- OS
-- Library version
-- ...
-
-### Installation
-
-(ideally very short)
-
-- npm install [package name]
-- mvn install
-- ...
-
-### Quickstart
-(Add steps to get up and running quickly)
-
-1. git clone [repository clone url]
-2. cd [repository name]
-3. ...
-
-
-## Demo
-
-A demo app is included to show how to use the project.
-
-To run the demo, follow these steps:
-
-(Add steps to start up the demo)
-
-1.
-2.
-3.
-
-## Resources
-
-(Any additional resources or related projects)
-
-- Link to supporting information
-- Link to similar sample
-- ...
+- [Microsoft Agent Framework (MAF)](https://aka.ms/agent-framework)
+- [Copilot Studio](https://learn.microsoft.com/microsoft-copilot-studio/)
+- [Model Context Protocol (MCP)](https://modelcontextprotocol.io)
+- [MCP .NET 샘플](https://aka.ms/mcp-dotnet-samples)
