@@ -1,6 +1,6 @@
 # 01: Microsoft Agent Framework 사용해서 에이전트 개발하기
 
-
+이 세션에서는 Microsoft Agent Framework를 사용해서 백엔드 에이전트를 개발합니다.
 
 
 ---
