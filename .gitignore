@@ -483,3 +483,8 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 .azure
+
+# Project specific
+*.pptx
+*.docx
+*.xlsx
