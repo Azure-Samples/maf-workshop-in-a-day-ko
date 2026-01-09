@@ -1,0 +1,43 @@
+using System.ClientModel;
+using System.ComponentModel;
+
+using Microsoft.Agents.AI;
+using Microsoft.Agents.AI.DevUI;
+using Microsoft.Agents.AI.Hosting;
+using Microsoft.Agents.AI.Workflows;
+using Microsoft.Extensions.AI;
+
+using OpenAI;
+using OpenAI.Responses;
+
+#pragma warning disable OPENAI001
+
+var builder = WebApplication.CreateBuilder(args);
+
+// IChatClient 인스턴스 생성하기
+
+// IChatClient 인스턴스 등록하기
+
+// Writer 에이전트 추가하기
+
+// Editor 에이전트 추가하기
+
+// Publisher 워크플로우 추가하기
+
+// OpenAI 관련 응답 히스토리 핸들러 등록하기
+
+var app = builder.Build();
+
+// OpenAI 관련 응답 히스토리 미들웨어 설정하기
+
+if (builder.Environment.IsDevelopment() == false)
+{
+    app.UseHttpsRedirection();
+}
+// DevUI 미들웨어 설정하기
+
+await app.RunAsync();
+
+// ChatClientFactory 클래스 추가하기
+
+// AgentTools 클래스 추가하기

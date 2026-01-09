@@ -1,14 +1,80 @@
 using System.ClientModel;
+using System.ComponentModel;
 
+using Microsoft.Agents.AI;
+using Microsoft.Agents.AI.DevUI;
+using Microsoft.Agents.AI.Hosting;
+using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
 
 using OpenAI;
 using OpenAI.Responses;
 
-namespace MafWorkshop.Agent.Factory;
-
 #pragma warning disable OPENAI001
 
+var builder = WebApplication.CreateBuilder(args);
+
+// IChatClient 인스턴스 생성하기
+IChatClient? chatClient = ChatClientFactory.CreateChatClient(builder.Configuration);
+
+// IChatClient 인스턴스 등록하기
+builder.Services.AddChatClient(chatClient);
+
+// Writer 에이전트 추가하기
+builder.AddAIAgent(
+    name: "writer",
+    instructions: "You write short stories (300 words or less) about the specified topic."
+);
+
+// Editor 에이전트 추가하기
+builder.AddAIAgent(
+    name: "editor",
+    createAgentDelegate: (sp, key) => new ChatClientAgent(
+        chatClient: sp.GetRequiredService<IChatClient>(),
+        name: key,
+        instructions: """
+            You edit short stories to improve grammar and style, ensuring the stories are less than 300 words. Once finished editing, you select a title and format the story for publishing.
+            """,
+        tools: [ AIFunctionFactory.Create(AgentTools.FormatStory) ]
+    )
+);
+
+// Publisher 워크플로우 추가하기
+builder.AddWorkflow(
+    name: "publisher",
+    createWorkflowDelegate: (sp, key) => AgentWorkflowBuilder.BuildSequential(
+        workflowName: key,
+        agents:
+        [
+            sp.GetRequiredKeyedService<AIAgent>("writer"),
+            sp.GetRequiredKeyedService<AIAgent>("editor")
+        ]
+    )
+).AddAsAIAgent();
+
+// OpenAI 관련 응답 히스토리 핸들러 등록하기
+builder.Services.AddOpenAIResponses();
+builder.Services.AddOpenAIConversations();
+
+var app = builder.Build();
+
+// OpenAI 관련 응답 히스토리 미들웨어 설정하기
+app.MapOpenAIResponses();
+app.MapOpenAIConversations();
+
+if (builder.Environment.IsDevelopment() == false)
+{
+    app.UseHttpsRedirection();
+}
+// DevUI 미들웨어 설정하기
+else
+{
+    app.MapDevUI();
+}
+
+await app.RunAsync();
+
+// ChatClientFactory 클래스 추가하기
 public class ChatClientFactory
 {
     public static IChatClient CreateChatClient(IConfiguration config)
@@ -33,7 +99,9 @@ public class ChatClientFactory
         var apiKey = azure["ApiKey"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:ApiKey");
         var deploymentName = azure["DeploymentName"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:DeploymentName");
 
-        Console.WriteLine($"Using {provider}: {deploymentName}");
+        Console.WriteLine();
+        Console.WriteLine($"\tUsing {provider}: {deploymentName}");
+        Console.WriteLine();
 
         var credential = new ApiKeyCredential(apiKey);
         var options = new OpenAIClientOptions
@@ -56,7 +124,9 @@ public class ChatClientFactory
         var token = github["Token"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Token");
         var model = github["Model"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Model");
 
-        Console.WriteLine($"Using {provider}: {model}");
+        Console.WriteLine();
+        Console.WriteLine($"\tUsing {provider}: {model}");
+        Console.WriteLine();
 
         var credential = new ApiKeyCredential(token);
         var options = new OpenAIClientOptions()
@@ -70,4 +140,15 @@ public class ChatClientFactory
 
         return chatClient;
     }
+}
+
+// AgentTools 클래스 추가하기
+public class AgentTools
+{
+    [Description("Formats the story for publication, revealing its title.")]
+    public static string FormatStory(string title, string story) => $"""
+        **Title**: {title}
+
+        {story}
+        """;
 }

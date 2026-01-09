@@ -20,14 +20,79 @@
 1. GitHub Codespaces 인스턴스가 만들어지면 터미널에서 아래 명령어를 하나씩 실행시켜 필요한 환경이 잘 만들어졌는지 확인하세요.
 
     ```bash
+    # .NET SDK
     dotnet --list-sdks
+
+    # node.js
     node --version
     npm --version
+
+    # PowerShell
+    pwsh --version
+
+    # Docker
+    docker info
+
+    # azd CLI
     azd version
+
+    # az CLI
     az --version
     az bicep version
+
+    # Aspire CLI
     aspire --version
     ```
+
+1. GitHub 리포지토리 상태를 확인합니다.
+
+    ```bash
+    git remote -v
+    ```
+
+   아래와 같이 보여야 합니다.
+
+    ```text
+    origin  https://github.com/Azure-Samples/maf-workshop-in-a-day-ko.git (fetch)
+    origin  https://github.com/Azure-Samples/maf-workshop-in-a-day-ko.git (push)
+    ```
+
+   만약 위와 같이 보이지 않는다면, GitHub Codespaces 인스턴스를 삭제하고 다시 만드세요.
+
+1. 아래 명령어를 실행시켜 GitHub Codespaces 인스턴스와 리포지토리를 사용자의 계정으로 포크합니다.
+
+    ```bash
+    git remote -v > remote.txt
+    git add . && git commit -m "Add remote.txt for forking"
+    ```
+
+   아마도 아래와 비슷한 메시지를 보게 됩니다.
+
+    ```text
+    You don't have write access to the Azure-Samples/maf-workshop-in-a-day-ko repository, so you cannot push changes to it.
+    To obtain write access we will point this codespace at your fork of Azure-Samples/maf-workshop-in-a-day-ko, creating that fork if it doesn't exist.
+    
+    Would you like to proceed?
+    ```
+
+   `y`를 눌러 계속합니다. 그러면 자동으로 현재 리포지토리를 사용자의 계정으로 포크합니다.
+
+1. 다시 한 번 리포지토리의 상태를 확인합니다.
+
+    ```bash
+    git remote -v
+    ```
+
+   이번에는 아래와 같이 보여야 합니다.
+
+    ```text
+    origin  https://github.com/<YOUR_GITHUB_ID>/maf-workshop-in-a-day-ko.git (fetch)
+    origin  https://github.com/<YOUR_GITHUB_ID>/maf-workshop-in-a-day-ko.git (push)
+    upstream        https://github.com/Azure-Samples/maf-workshop-in-a-day-ko (fetch)
+    upstream        https://github.com/Azure-Samples/maf-workshop-in-a-day-ko (push)
+    ```
+
+   만약 위와 같이 보이지 않는다면 다시 GitHub Codespaces 인스턴스를 만들고 이 과정을 반복하세요.
 
 ## Azure 로그인
 
@@ -91,6 +156,16 @@
 1. [퍼스널 액세스 토큰(PAT)](https://docs.github.com/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)을 생성합니다. 이 때, `models:read` 권한을 주지 않으면 GitHub Models에 접근할 수 없습니다.
 
 1. PAT 생성 후 잘 보관해 둡니다. 한 번 생성한 토큰은 나중에 다시 확인할 수 없으므로 분실할 경우 새로 생성해야 합니다.
+
+    ```bash
+    # zsh/bash
+    githubToken="{{GITHUB_PAT}}"
+    ```
+
+    ```powershell
+    # PowerShell
+    $githubToken = "{{GITHUB_PAT}}"
+    ```
 
 ---
 
