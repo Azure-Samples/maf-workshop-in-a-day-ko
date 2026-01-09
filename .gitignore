@@ -485,6 +485,7 @@ $RECYCLE.BIN/
 .azure
 
 # Project specific
+workshop/
 *.pptx
 *.docx
 *.xlsx
