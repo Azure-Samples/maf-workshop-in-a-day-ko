@@ -58,6 +58,7 @@ builder.Services.AddOpenAIResponses();
 builder.Services.AddOpenAIConversations();
 
 // AG-UI 등록하기
+builder.Services.AddAGUI();
 
 var app = builder.Build();
 
@@ -66,6 +67,10 @@ app.MapOpenAIResponses();
 app.MapOpenAIConversations();
 
 // AG-UI 미들웨어 설정하기
+app.MapAGUI(
+    pattern: "ag-ui",
+    aiAgent: app.Services.GetRequiredKeyedService<AIAgent>("publisher")
+);
 
 if (builder.Environment.IsDevelopment() == false)
 {

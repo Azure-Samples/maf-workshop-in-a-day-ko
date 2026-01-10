@@ -1,0 +1,102 @@
+﻿@page "/"
+@using System.ComponentModel
+@inject IChatClient ChatClient
+@inject NavigationManager Nav
+@implements IDisposable
+
+<PageTitle>Chat</PageTitle>
+
+<ChatHeader OnNewChat="@ResetConversationAsync" />
+
+<ChatMessageList Messages="@messages" InProgressMessage="@currentResponseMessage">
+    <NoMessagesContent>
+        <div>안녕하세요, 무엇을 도와드릴까요?</div>
+    </NoMessagesContent>
+</ChatMessageList>
+
+<div class="chat-container">
+    <ChatInput OnSend="@AddUserMessageAsync" @ref="@chatInput" />
+</div>
+
+@code {
+    private const string SystemPrompt = """
+        You're a helpful AI assistant.
+        """;
+
+    private int statefulMessageCount;
+    private readonly ChatOptions chatOptions = new();
+    private readonly List<ChatMessage> messages = new();
+    private CancellationTokenSource? currentResponseCancellation;
+    private ChatMessage? currentResponseMessage;
+    private ChatInput? chatInput;
+
+    protected override void OnInitialized()
+    {
+        statefulMessageCount = 0;
+        messages.Add(new(ChatRole.System, SystemPrompt));
+    }
+
+    private async Task AddUserMessageAsync(ChatMessage userMessage)
+    {
+        CancelAnyCurrentResponse();
+
+        // Add the user message to the conversation
+        messages.Add(userMessage);
+        await chatInput!.FocusAsync();
+
+        // Stream and display a new response from the IChatClient
+        var responseText = new TextContent("");
+        currentResponseMessage = new ChatMessage(ChatRole.Assistant, [responseText]);
+        currentResponseCancellation = new();
+
+        await GetStreamingResponseAsync(responseText, currentResponseMessage, currentResponseCancellation.Token);
+
+        // Store the final response in the conversation, and begin getting suggestions
+        messages.Add(currentResponseMessage!);
+        statefulMessageCount = chatOptions.ConversationId is not null ? messages.Count : 0;
+        currentResponseMessage = null;
+    }
+
+    // GetStreamingResponseAsync() 메서드 원본 삭제하기
+    private async Task GetStreamingResponseAsync(TextContent responseText, ChatMessage responseMessage, CancellationToken cancellationToken)
+    {
+        await foreach (var update in ChatClient.GetStreamingResponseAsync(messages.Skip(statefulMessageCount), chatOptions, cancellationToken))
+        {
+            await Task.Delay(50);
+
+            messages.AddMessages(update, filter: c => c is not TextContent);
+            responseText.Text += update.Text;
+            chatOptions.ConversationId = update.ConversationId;
+            ChatMessageItem.NotifyChanged(responseMessage);
+
+            StateHasChanged();
+        }
+    }
+
+    // GetStreamingResponseAsync() 메서드 리팩토링하기
+
+    private void CancelAnyCurrentResponse()
+    {
+        // If a response was cancelled while streaming, include it in the conversation so it's not lost
+        if (currentResponseMessage is not null)
+        {
+            messages.Add(currentResponseMessage);
+        }
+
+        currentResponseCancellation?.Cancel();
+        currentResponseMessage = null;
+    }
+
+    private async Task ResetConversationAsync()
+    {
+        CancelAnyCurrentResponse();
+        messages.Clear();
+        messages.Add(new(ChatRole.System, SystemPrompt));
+        chatOptions.ConversationId = null;
+        statefulMessageCount = 0;
+        await chatInput!.FocusAsync();
+    }
+
+    public void Dispose()
+        => currentResponseCancellation?.Cancel();
+}

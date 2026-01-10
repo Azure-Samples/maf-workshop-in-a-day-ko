@@ -11,7 +11,7 @@
 
 ## 사전 준비 사항
 
-이전 [00: 개발 환경 설정](./00-setup.md)에서 개발 환경을 모두 설정한 상태라고 가정합니다.
+이전 [00: 개발 환경 설정하기](./00-setup.md)에서 개발 환경을 모두 설정한 상태라고 가정합니다.
 
 ## 리포지토리 루트 설정
 
@@ -377,6 +377,54 @@ save-points/
     ```
 
 1. 다시 애플리케이션을 실행합니다.
+
+    ```bash
+    dotnet watch run --project ./MafWorkshop.Agent
+    ```
+
+1. 자동으로 웹 브라우저가 열리면서 DevUI 페이지가 나타나는지 확인합니다.
+
+   ![DevUI 페이지 - 다중 에이전트](./images/step-01-image-04.png)
+
+   Publisher 워크플로우를 선택합니다.
+
+   ![DevUI 페이지 - Publisher 워크플로우](./images/step-01-image-05.png)
+
+   메시지를 보내고 결과를 확인해 봅니다.
+
+   ![Publisher 워크플로우에 메시지 보내기](./images/step-01-image-06.png)
+
+   ![Publisher 워크플로우 실행 결과](./images/step-01-image-07.png)
+
+1. `CTRL`+`C` 키를 눌러 애플리케이션 실행을 종료합니다.
+
+## 완성본 결과 확인
+
+이 세션의 완성본은 `$REPOSITORY_ROOT/save-points/step-01/complete`에서 확인할 수 있습니다.
+
+1. 앞서 실습한 `workshop` 디렉토리가 있다면 삭제하거나 다른 이름으로 바꿔주세요. 예) `workshop-step-01`
+1. 터미널을 열고 아래 명령어를 차례로 실행시켜 실습 디렉토리를 만들고 시작 프로젝트를 복사합니다.
+
+    ```bash
+    # Bash/Zsh
+    mkdir -p $REPOSITORY_ROOT/workshop && \
+        cp -a $REPOSITORY_ROOT/save-points/step-01/complete/. $REPOSITORY_ROOT/workshop/
+    ```
+
+    ```powershell
+    # PowerShell
+    New-Item -Type Directory -Path $REPOSITORY_ROOT/workshop -Force && `
+        Copy-Item -Path $REPOSITORY_ROOT/save-points/step-01/complete/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
+    ```
+
+1. 워크샵 디렉토리로 이동합니다.
+
+    ```bash
+    cd $REPOSITORY_ROOT/workshop
+    ```
+
+1. 이전 [LLM 접근 권한 설정](#llm-접근-권한-설정)을 따라 LLM 접근 권한을 설정합니다.
+1. 백엔드 에이전트 애플리케이션을 실행합니다.
 
     ```bash
     dotnet watch run --project ./MafWorkshop.Agent

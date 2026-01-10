@@ -486,6 +486,7 @@ $RECYCLE.BIN/
 
 # Project specific
 workshop/
+save-points/**/*Temp/
 *.pptx
 *.docx
 *.xlsx
