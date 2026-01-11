@@ -16,12 +16,15 @@ using OpenAI.Responses;
 var builder = WebApplication.CreateBuilder(args);
 
 // Observability 및 Traceability를 위한 Service Defaults 추가하기
+builder.AddServiceDefaults();
 
 // IChatClient 인스턴스 생성하기
-IChatClient? chatClient = ChatClientFactory.CreateChatClient(builder.Configuration);
+// IChatClient? chatClient = ChatClientFactory.CreateChatClient(builder.Configuration);
 
 // IChatClient 인스턴스 등록하기
-builder.Services.AddChatClient(chatClient);
+builder.AddOpenAIClient("chat")
+       .AddChatClient();
+//builder.Services.AddChatClient(chatClient);
 
 // Writer 에이전트 추가하기
 builder.AddAIAgent(
@@ -65,6 +68,7 @@ builder.Services.AddAGUI();
 var app = builder.Build();
 
 // Observability 및 Traceability를 위한 미들웨어 설정하기
+app.MapDefaultEndpoints();
 
 // OpenAI 관련 응답 히스토리 미들웨어 설정하기
 app.MapOpenAIResponses();

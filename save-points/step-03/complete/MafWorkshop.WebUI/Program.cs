@@ -6,6 +6,7 @@ using Microsoft.Extensions.AI;
 var builder = WebApplication.CreateBuilder(args);
 
 // Observability 및 Traceability를 위한 Service Defaults 추가하기
+builder.AddServiceDefaults();
 
 builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
@@ -13,11 +14,15 @@ builder.Services.AddRazorComponents()
 // HttpClientFactory 등록하기
 builder.Services.AddHttpClient("agent", client =>
 {
-    var endpoint = builder.Environment.IsDevelopment() == true
-        ? builder.Configuration["AgentEndpoints:Http"]
-        : builder.Configuration["AgentEndpoints:Https"];
-    client.BaseAddress = new Uri(endpoint!);
+    client.BaseAddress = new Uri("https+http://agent");
 });
+// builder.Services.AddHttpClient("agent", client =>
+// {
+//     var endpoint = builder.Environment.IsDevelopment() == true
+//         ? builder.Configuration["AgentEndpoints:Http"]
+//         : builder.Configuration["AgentEndpoints:Https"];
+//     client.BaseAddress = new Uri(endpoint!);
+// });
 
 // AG-UI 연동 IChatClient 인스턴스 등록하기
 builder.Services.AddChatClient(sp => new AGUIChatClient(
@@ -29,6 +34,7 @@ builder.Services.AddChatClient(sp => new AGUIChatClient(
 var app = builder.Build();
 
 // Observability 및 Traceability를 위한 미들웨어 설정하기
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() == false)

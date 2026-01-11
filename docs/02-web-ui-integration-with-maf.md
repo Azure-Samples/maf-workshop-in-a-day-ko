@@ -4,7 +4,7 @@
 
 ## 세션 목표
 
-- Microsoft Agent Framework에 AGi-UI 프로토콜을 이용해서 프론트엔드 UI를 연결할 수 있습니다.
+- Microsoft Agent Framework에 AG-UI 프로토콜을 이용해서 프론트엔드 UI를 연결할 수 있습니다.
 
 ## 사전 준비 사항
 
@@ -50,6 +50,11 @@ save-points/
             ├── appsettings.json
             └── MafWorkshop.WebUI.csproj
 ```
+
+> 프로젝트 소개:
+>
+> - `MafWorkshop.Agent`: 백엔드 에이전트 애플리케이션 프로젝트
+> - `MafWorkshop.WebUI`: 프론트엔드 웹 UI 애플리케이션 프로젝트
 
 1. 앞서 실습한 `workshop` 디렉토리가 있다면 삭제하거나 다른 이름으로 바꿔주세요. 예) `workshop-step-01`
 1. 터미널을 열고 아래 명령어를 차례로 실행시켜 실습 디렉토리를 만들고 시작 프로젝트를 복사합니다.
@@ -197,7 +202,7 @@ save-points/
     }
     ```
 
-    **삭제후:**
+    **삭제후:** 주석만 남아있습니다.
 
     ```csharp
     // GetStreamingResponseAsync() 메서드 원본 삭제하기
@@ -341,4 +346,4 @@ save-points/
 
 축하합니다! 에이전트 백엔드에 AG-UI 프로토콜을 활용해서 프론트엔드를 연결했습니다. 이제 다음 단계로 이동하세요!
 
-👈 [01: Microsoft Agent Framework 사용해서 에이전트 개발하기](./01-agent-with-maf.md) | [03: MCP 서버 개발하기](./03-mcp-server-development.md) 👉
+👈 [01: Microsoft Agent Framework 사용해서 에이전트 개발하기](./01-agent-with-maf.md) | [03: Aspire로 프론트엔드 웹 UI와 백엔드 에이전트 오케스트레이션하기](./03-aspire-orchestration.md) 👉

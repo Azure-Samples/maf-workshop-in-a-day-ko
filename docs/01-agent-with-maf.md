@@ -44,6 +44,10 @@ save-points/
             └── MafWorkshop.Agent.csproj
 ```
 
+> 프로젝트 소개:
+>
+> - `MafWorkshop.Agent`: 백엔드 에이전트 애플리케이션 프로젝트
+
 1. 터미널을 열고 아래 명령어를 차례로 실행시켜 실습 디렉토리를 만들고 시작 프로젝트를 복사합니다.
 
     ```bash

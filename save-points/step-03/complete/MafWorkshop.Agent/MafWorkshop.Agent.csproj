@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>834b43c9-bb9d-4fc5-bd44-1f8443cc6ed3</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.OpenAI" Version="13.*-*" />
+    <PackageReference Include="Microsoft.Agents.AI" Version="1.*-*" />
+    <PackageReference Include="Microsoft.Agents.AI.DevUI" Version="1.*-*" />
+    <PackageReference Include="Microsoft.Agents.AI.Hosting" Version="1.*-*" />
+    <PackageReference Include="Microsoft.Agents.AI.Hosting.AGUI.AspNetCore" Version="1.*-*" />
+    <PackageReference Include="Microsoft.Agents.AI.Hosting.OpenAI" Version="1.*-*" />
+    <PackageReference Include="Microsoft.Agents.AI.OpenAI" Version="1.*-*" />
+    <PackageReference Include="Microsoft.Agents.AI.Workflows" Version="1.*-*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MafWorkshop.ServiceDefaults\MafWorkshop.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>

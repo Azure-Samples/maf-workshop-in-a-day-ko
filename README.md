@@ -15,14 +15,15 @@
 
 이 워크샵은 아래와 같은 내용으로 진행합니다. 모두 자기주도학습의 형태로 진행할 수 있으므로, 워크샵 시간에 다 마치지 못하더라도 끝까지 따라해 보세요.
 
-| 세션                                                       | 링크                                                                                                        |
-|------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|
-| 00: 개발 환경 설정                                         | [00-setup.md](./docs/00-setup.md)                                                                           |
-| 01: Microsoft Agent Framework 사용해서 에이전트 개발하기   | [01-agent-with-maf.md](./docs/01-agent-with-maf.md)                                                         |
-| 02: Microsoft Agent Framework에 웹 UI 연동하기             | [02-web-ui-integration-with-maf.md](./docs/02-web-ui-integration-with-maf.md)                               |
-| 03: MCP 서버 개발하기                                      | [03-mcp-server-development.md](./docs/03-mcp-server-development.md)                                         |
-| 04: Microsoft Agent Framework에 MCP 서버 연동하기          | [04-mcp-server-integration-with-maf.md](./docs/04-mcp-server-integration-with-maf.md)                       |
-| 05: Copilot Studio에서 에이전트 개발하고 MCP 서버 연동하기 | [05-mcp-server-integration-with-copilot-studio.md](./docs/05-mcp-server-integration-with-copilot-studio.md) |
+| 세션                                                               | 링크                                                                                                        |
+|--------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| 00: 개발 환경 설정                                                 | [00-setup.md](./docs/00-setup.md)                                                                           |
+| 01: Microsoft Agent Framework 사용해서 에이전트 개발하기           | [01-agent-with-maf.md](./docs/01-agent-with-maf.md)                                                         |
+| 02: Microsoft Agent Framework에 웹 UI 연동하기                     | [02-web-ui-integration-with-maf.md](./docs/02-web-ui-integration-with-maf.md)                               |
+| 03: Aspire로 프론트엔드 웹 UI와 백엔드 에이전트 오케스트레이션하기 | [03-aspire-orchestration.md](./docs/03-aspire-orchestration.md)                                             |
+| 04: MCP 서버 개발하기                                              | [04-mcp-server-development.md](./docs/04-mcp-server-development.md)                                         |
+| 05: Microsoft Agent Framework에 MCP 서버 연동하기                  | [05-mcp-server-integration-with-maf.md](./docs/05-mcp-server-integration-with-maf.md)                       |
+| 06: Copilot Studio에서 에이전트 개발하고 MCP 서버 연동하기         | [06-mcp-server-integration-with-copilot-studio.md](./docs/06-mcp-server-integration-with-copilot-studio.md) |
 
 ## 추가 리소스
 
