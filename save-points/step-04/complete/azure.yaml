@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: maf-workshop-in-a-day-ko-mcp-server
+
+metadata:
+  template: maf-workshop-in-a-day-ko-mcp-server@1.0.0
+  author: Justin Yoo
+  description: Todo MCP server deployment using Azure Developer CLI
+
+services:
+  mafworkshop-mcptodo:
+    project: MafWorkshop.McpTodo
+    host: containerapp
+    language: dotnet
+
+resources:
+  mafworkshop-mcptodo:
+    type: host.containerapp
+    port: 8080
