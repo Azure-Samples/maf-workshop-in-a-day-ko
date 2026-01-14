@@ -135,6 +135,18 @@
 
    잠시 기다리면 Azure OpenAI 인스턴스가 만들어진 것을 확인할 수 있습니다.
 
+   > 경우에 따라 `AZURE_TENANT_ID` 환경 변수를 설정해야 할 수도 있습니다.
+   >
+   > ```bash
+   > # zsh/bash
+   > export AZURE_TENANT_ID=$(az account show --query "tenantId" -o tsv)
+   > ```
+   >
+   > ```powershell
+   > # PowerShell
+   > $env:AZURE_TENANT_ID = az account show --query "tenantId" -o tsv
+   > ```
+
 1. 아래 명령어를 실행시켜 Azure OpenAI 인스턴스의 엔드포인트와 API 키 값을 확인합니다.
 
     ```bash

@@ -1,9 +1,9 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
 
-name: maf-workshop-in-a-day-ko-mcp-server
+name: maf-workshop-in-a-day-ko
 
 metadata:
-  template: maf-workshop-in-a-day-ko-mcp-server@1.0.0
+  template: maf-workshop-in-a-day-ko@1.0.0
   author: Justin Yoo
   description: Todo MCP server deployment using Azure Developer CLI
 
