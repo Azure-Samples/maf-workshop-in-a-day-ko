@@ -26,32 +26,6 @@ builder.AddAIAgent(
     instructions: "You write short stories (300 words or less) about the specified topic."
 );
 
-// Editor 에이전트 추가하기
-builder.AddAIAgent(
-    name: "editor",
-    createAgentDelegate: (sp, key) => new ChatClientAgent(
-        chatClient: sp.GetRequiredService<IChatClient>(),
-        name: key,
-        instructions: """
-            You edit short stories to improve grammar and style, ensuring the stories are less than 300 words. Once finished editing, you select a title and format the story for publishing.
-            """,
-        tools: [ AIFunctionFactory.Create(AgentTools.FormatStory) ]
-    )
-);
-
-// Publisher 워크플로우 추가하기
-builder.AddWorkflow(
-    name: "publisher",
-    createWorkflowDelegate: (sp, key) => AgentWorkflowBuilder.BuildSequential(
-        workflowName: key,
-        agents:
-        [
-            sp.GetRequiredKeyedService<AIAgent>("writer"),
-            sp.GetRequiredKeyedService<AIAgent>("editor")
-        ]
-    )
-).AddAsAIAgent();
-
 // OpenAI 관련 응답 히스토리 핸들러 등록하기
 builder.Services.AddOpenAIResponses();
 builder.Services.AddOpenAIConversations();
@@ -82,35 +56,10 @@ public class ChatClientFactory
         var provider = config["LlmProvider"] ?? throw new InvalidOperationException("Missing configuration: LlmProvider");
         IChatClient chatClient = provider switch
         {
-            "AzureOpenAI" => CreateAzureOpenAIChatClient(config),
             "GitHubModels" => CreateGitHubModelsChatClient(config),
+            "AzureOpenAI" => CreateAzureOpenAIChatClient(config),
             _ => throw new NotSupportedException($"The specified LLM provider '{provider}' is not supported.")
         };
-
-        return chatClient;
-    }
-
-    private static IChatClient CreateAzureOpenAIChatClient(IConfiguration config)
-    {
-        var provider = config["LlmProvider"];
-
-        var azure = config.GetSection("Azure:OpenAI");
-        var endpoint = azure["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:Endpoint");
-        var apiKey = azure["ApiKey"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:ApiKey");
-        var deploymentName = azure["DeploymentName"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:DeploymentName");
-
-        Console.WriteLine();
-        Console.WriteLine($"\tUsing {provider}: {deploymentName}");
-        Console.WriteLine();
-
-        var credential = new ApiKeyCredential(apiKey);
-        var options = new OpenAIClientOptions
-        {
-            Endpoint = new Uri($"{endpoint.TrimEnd('/')}/openai/v1/")
-        };
-
-        var client = new ResponsesClient(deploymentName, credential, options);
-        var chatClient = client.AsIChatClient();
 
         return chatClient;
     }
@@ -140,15 +89,29 @@ public class ChatClientFactory
 
         return chatClient;
     }
-}
 
-// AgentTools 클래스 추가하기
-public class AgentTools
-{
-    [Description("Formats the story for publication, revealing its title.")]
-    public static string FormatStory(string title, string story) => $"""
-        **Title**: {title}
+    private static IChatClient CreateAzureOpenAIChatClient(IConfiguration config)
+    {
+        var provider = config["LlmProvider"];
 
-        {story}
-        """;
+        var azure = config.GetSection("Azure:OpenAI");
+        var endpoint = azure["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:Endpoint");
+        var apiKey = azure["ApiKey"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:ApiKey");
+        var deploymentName = azure["DeploymentName"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:DeploymentName");
+
+        Console.WriteLine();
+        Console.WriteLine($"\tUsing {provider}: {deploymentName}");
+        Console.WriteLine();
+
+        var credential = new ApiKeyCredential(apiKey);
+        var options = new OpenAIClientOptions
+        {
+            Endpoint = new Uri($"{endpoint.TrimEnd('/')}/openai/v1/")
+        };
+
+        var client = new ResponsesClient(deploymentName, credential, options);
+        var chatClient = client.AsIChatClient();
+
+        return chatClient;
+    }
 }

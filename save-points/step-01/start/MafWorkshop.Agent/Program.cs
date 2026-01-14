@@ -20,10 +20,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Writer 에이전트 추가하기
 
-// Editor 에이전트 추가하기
-
-// Publisher 워크플로우 추가하기
-
 // OpenAI 관련 응답 히스토리 핸들러 등록하기
 
 var app = builder.Build();
@@ -39,5 +35,3 @@ if (builder.Environment.IsDevelopment() == false)
 await app.RunAsync();
 
 // ChatClientFactory 클래스 추가하기
-
-// AgentTools 클래스 추가하기

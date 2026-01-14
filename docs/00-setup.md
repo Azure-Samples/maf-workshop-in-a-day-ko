@@ -94,6 +94,38 @@
 
    만약 위와 같이 보이지 않는다면 다시 GitHub Codespaces 인스턴스를 만들고 이 과정을 반복하세요.
 
+## 리포지토리 루트 설정
+
+1. 아래 명령어를 실행시켜 `$REPOSITORY_ROOT` 환경 변수를 설정합니다.
+
+    ```bash
+    # zsh/bash
+    REPOSITORY_ROOT=$(git rev-parse --show-toplevel)
+    ```
+
+    ```powershell
+    # PowerShell
+    $REPOSITORY_ROOT = git rev-parse --show-toplevel
+    ```
+
+## GitHub Models 설정
+
+> **NOTE**: 만약 Azure 구독을 사용할 수 없을 경우 [GitHub Models](https://docs.github.com/github-models)에서 제공하는 [gpt-5-mini](https://github.com/marketplace/models/azure-openai/gpt-5-mini) 모델을 무료로 사용할 수 있습니다.
+
+1. [퍼스널 액세스 토큰(PAT)](https://docs.github.com/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)을 생성합니다. 이 때, `models:read` 권한을 주지 않으면 GitHub Models에 접근할 수 없습니다.
+
+1. PAT 생성 후 잘 보관해 둡니다. 한 번 생성한 토큰은 나중에 다시 확인할 수 없으므로 분실할 경우 새로 생성해야 합니다.
+
+    ```bash
+    # zsh/bash
+    githubToken="{{GITHUB_PAT}}"
+    ```
+
+    ```powershell
+    # PowerShell
+    $githubToken = "{{GITHUB_PAT}}"
+    ```
+
 ## Azure 로그인
 
 > **NOTE**: Azure 구독을 제공 받았을 경우 진행하세요. 워크샵에 따라 Azure 구독을 제공하지 않을 수도 있습니다.
@@ -122,6 +154,12 @@
 
 > **NOTE**: Azure 구독을 제공 받았을 경우 진행하세요. 워크샵에 따라 Azure 구독을 제공하지 않을 수도 있습니다.
 
+1. 리포지토리 루트 디렉토리에 있는지 확인합니다.
+
+    ```bash
+    cd $REPOSITORY_ROOT
+    ```
+
 1. 아래 명령어를 실행시켜 Azure OpenAI 인스턴스를 생성하세요.
 
     ```bash
@@ -130,8 +168,8 @@
 
    아래와 같은 질문이 나오면 적당하게 입력합니다.
 
-   - `? Enter a unique environment name:` 👉 환경 이름 (예: mafworkshop-2026)
-   - `? Enter a value for the 'location' infrastructure parameter:` 👉 지역 선택 (예: Australia East)
+   - `? Enter a unique environment name:` 👉 환경 이름 (예: `mafworkshop-2026`)
+   - `? Enter a value for the 'location' infrastructure parameter:` 👉 지역 선택 (예: `Australia East`)
 
    잠시 기다리면 Azure OpenAI 인스턴스가 만들어진 것을 확인할 수 있습니다.
 
@@ -161,26 +199,8 @@
     $apiKey = az cognitiveservices account keys list --name $(azd env get-value 'AZURE_OPENAI_NAME') --resource-group rg-$(azd env get-value 'AZURE_ENV_NAME') --query "key1" -o tsv
     ```
 
-## GitHub Models 설정
-
-> **NOTE**: 만약 Azure 구독을 사용할 수 없을 경우 [GitHub Models](https://docs.github.com/github-models)에서 제공하는 [gpt-5-mini](https://github.com/marketplace/models/azure-openai/gpt-5-mini) 모델을 무료로 사용할 수 있습니다.
-
-1. [퍼스널 액세스 토큰(PAT)](https://docs.github.com/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)을 생성합니다. 이 때, `models:read` 권한을 주지 않으면 GitHub Models에 접근할 수 없습니다.
-
-1. PAT 생성 후 잘 보관해 둡니다. 한 번 생성한 토큰은 나중에 다시 확인할 수 없으므로 분실할 경우 새로 생성해야 합니다.
-
-    ```bash
-    # zsh/bash
-    githubToken="{{GITHUB_PAT}}"
-    ```
-
-    ```powershell
-    # PowerShell
-    $githubToken = "{{GITHUB_PAT}}"
-    ```
-
 ---
 
 축하합니다! 워크샵을 진행하기 위한 기본 개발 환경 설정이 끝났습니다. 이제 다음 단계로 이동하세요!
 
-👈 [README](../README.md) | [01: Microsoft Agent Framework 사용해서 에이전트 개발하기](./01-agent-with-maf.md) 👉
+👈 [README](../README.md) | [01: Microsoft Agent Framework 사용해서 단일 에이전트 개발하기](./01-single-agent-with-maf.md) 👉

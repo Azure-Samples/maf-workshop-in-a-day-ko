@@ -1,12 +1,9 @@
-using System.ComponentModel;
 using System.Reflection;
 
 using MafWorkshop.McpTodo;
 
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-
-using ModelContextProtocol.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +15,9 @@ builder.Services.AddSingleton(connection);
 builder.Services.AddDbContext<TodoDbContext>(options => options.UseSqlite(connection));
 builder.Services.AddScoped<ITodoRepository, TodoRepository>();
 
-// MCP 서버 추가하기
+builder.Services.AddMcpServer()
+                .WithHttpTransport(o => o.Stateless = true)
+                .WithToolsFromAssembly(Assembly.GetEntryAssembly());
 
 var app = builder.Build();
 
@@ -33,8 +32,6 @@ if (app.Environment.IsDevelopment() == false)
     app.UseHttpsRedirection();
 }
 
-// MCP 엔드포인트 미들웨어 추가하기
+app.MapMcp("/mcp");
 
 await app.RunAsync();
-
-// Todo Tool 추가하기

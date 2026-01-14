@@ -1,4 +1,4 @@
-# 02: Microsoft Agent Framework에 웹 UI 연동하기
+# 02: Microsoft Agent Framework에 프론트엔드 UI 연동하기
 
 이 세션에서는 Microsoft Agent Framework로 만들어진 백엔드 에이전트에 [AG-UI 프로토콜](https://docs.ag-ui.com/introduction)을 활용해서 웹 UI를 연동합니다.
 
@@ -15,7 +15,7 @@
 1. 아래 명령어를 실행시켜 `$REPOSITORY_ROOT` 환경 변수를 설정합니다.
 
     ```bash
-    # Bash/Zsh
+    # zsh/bash
     REPOSITORY_ROOT=$(git rev-parse --show-toplevel)
     ```
 
@@ -60,7 +60,7 @@ save-points/
 1. 터미널을 열고 아래 명령어를 차례로 실행시켜 실습 디렉토리를 만들고 시작 프로젝트를 복사합니다.
 
     ```bash
-    # Bash/Zsh
+    # zsh/bash
     rm -rf $REPOSITORY_ROOT/workshop && \
         mkdir -p $REPOSITORY_ROOT/workshop && \
         cp -a $REPOSITORY_ROOT/save-points/step-02/start/. $REPOSITORY_ROOT/workshop/
@@ -303,7 +303,7 @@ save-points/
 1. 터미널을 열고 아래 명령어를 차례로 실행시켜 실습 디렉토리를 만들고 시작 프로젝트를 복사합니다.
 
     ```bash
-    # Bash/Zsh
+    # zsh/bash
     mkdir -p $REPOSITORY_ROOT/workshop && \
         cp -a $REPOSITORY_ROOT/save-points/step-02/complete/. $REPOSITORY_ROOT/workshop/
     ```

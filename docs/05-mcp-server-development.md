@@ -17,7 +17,7 @@
 1. 아래 명령어를 실행시켜 `$REPOSITORY_ROOT` 환경 변수를 설정합니다.
 
     ```bash
-    # Bash/Zsh
+    # zsh/bash
     REPOSITORY_ROOT=$(git rev-parse --show-toplevel)
     ```
 
@@ -55,7 +55,7 @@ save-points/
 1. 터미널을 열고 아래 명령어를 차례로 실행시켜 실습 디렉토리를 만들고 시작 프로젝트를 복사합니다.
 
     ```bash
-    # Bash/Zsh
+    # zsh/bash
     rm -rf $REPOSITORY_ROOT/workshop && \
         mkdir -p $REPOSITORY_ROOT/workshop && \
         cp -a $REPOSITORY_ROOT/save-points/step-04/start/. $REPOSITORY_ROOT/workshop/
@@ -345,7 +345,7 @@ save-points/
 1. 터미널을 열고 아래 명령어를 차례로 실행시켜 실습 디렉토리를 만들고 시작 프로젝트를 복사합니다.
 
     ```bash
-    # Bash/Zsh
+    # zsh/bash
     mkdir -p $REPOSITORY_ROOT/workshop && \
         cp -a $REPOSITORY_ROOT/save-points/step-04/complete/. $REPOSITORY_ROOT/workshop/
     ```

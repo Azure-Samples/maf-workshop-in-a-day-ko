@@ -5,10 +5,15 @@ name: maf-workshop-in-a-day-ko
 metadata:
   template: maf-workshop-in-a-day-ko@1.0.0
   author: Justin Yoo
-  description: All-in-One deployment using Azure Developer CLI
+  description: Todo MCP server deployment using Azure Developer CLI
 
-services:  
-  app:
-    language: dotnet
-    project: ./MafWorkshop.AppHost/MafWorkshop.AppHost.csproj
+services:
+  mafworkshop-mcptodo:
+    project: MafWorkshop.McpTodo
     host: containerapp
+    language: dotnet
+
+resources:
+  mafworkshop-mcptodo:
+    type: host.containerapp
+    port: 8080

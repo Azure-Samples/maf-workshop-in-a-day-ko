@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MafWorkshop.ServiceDefaults
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MafWorkshop.AppHost", "MafWorkshop.AppHost\MafWorkshop.AppHost.csproj", "{21707B31-A413-4743-8538-5FFE9C610AD5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MafWorkshop.McpTodo", "MafWorkshop.McpTodo\MafWorkshop.McpTodo.csproj", "{4E4E5273-3AA1-4AED-8010-52337B71D123}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,18 @@ Global
 		{21707B31-A413-4743-8538-5FFE9C610AD5}.Release|x64.Build.0 = Release|Any CPU
 		{21707B31-A413-4743-8538-5FFE9C610AD5}.Release|x86.ActiveCfg = Release|Any CPU
 		{21707B31-A413-4743-8538-5FFE9C610AD5}.Release|x86.Build.0 = Release|Any CPU
+		{4E4E5273-3AA1-4AED-8010-52337B71D123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E4E5273-3AA1-4AED-8010-52337B71D123}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E4E5273-3AA1-4AED-8010-52337B71D123}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4E4E5273-3AA1-4AED-8010-52337B71D123}.Debug|x64.Build.0 = Debug|Any CPU
+		{4E4E5273-3AA1-4AED-8010-52337B71D123}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4E4E5273-3AA1-4AED-8010-52337B71D123}.Debug|x86.Build.0 = Debug|Any CPU
+		{4E4E5273-3AA1-4AED-8010-52337B71D123}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E4E5273-3AA1-4AED-8010-52337B71D123}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E4E5273-3AA1-4AED-8010-52337B71D123}.Release|x64.ActiveCfg = Release|Any CPU
+		{4E4E5273-3AA1-4AED-8010-52337B71D123}.Release|x64.Build.0 = Release|Any CPU
+		{4E4E5273-3AA1-4AED-8010-52337B71D123}.Release|x86.ActiveCfg = Release|Any CPU
+		{4E4E5273-3AA1-4AED-8010-52337B71D123}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
