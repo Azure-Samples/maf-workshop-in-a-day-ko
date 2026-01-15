@@ -2,6 +2,8 @@
 
 [Microsoft Agent Framework(MAF)](https://aka.ms/agent-framework)를 활용해서 [Copilot Studio](https://learn.microsoft.com/microsoft-copilot-studio/)와 연동해 보는 워크샵 자료입니다.
 
+![히어로 이미지](./assets/hero.jpg)
+
 ## 사전 준비 사항
 
 이 워크샵은 기본적으로 [GitHub Codespaces](https://docs.github.com/codespaces)를 활용해서 진행하기 때문에 아래와 같은 내용만 준비하면 충분합니다.
