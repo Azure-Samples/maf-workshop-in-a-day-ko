@@ -1,0 +1,15 @@
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "aca-server-fqdn",
+      "description": "Azure Container Apps FQDN"
+    }
+  ],
+  "servers": {
+    "todo-list": {
+      "type": "http",
+      "url": "https://${input:aca-server-fqdn}/mcp"
+    }
+  }
+}

@@ -485,6 +485,8 @@ $RECYCLE.BIN/
 .azure
 
 # Project specific
+workshop/
+save-points/**/*Temp/
 *.pptx
 *.docx
 *.xlsx
