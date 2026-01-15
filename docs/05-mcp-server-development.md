@@ -1,4 +1,4 @@
-# 04: MCP 서버 개발하기
+# 05: MCP 서버 개발하기
 
 이 세션에서는 백엔드 에이전트에 통합할 [Model Context Protocal(MCP) 서버](https://modelcontextprotocol.io)를 개발합니다.
 
@@ -6,7 +6,9 @@
 
 - MCP 서버를 개발할 수 있습니다.
 - 로컬 HTTP 환경에서 MCP 서버를 작동시킬 수 있습니다.
-- GitHub Copilot에 MCP 서버를 연결시킬 수 있습니다.
+- MCP 서버를 Azure 클라우드로 배포할 수 있습니다.
+- 리모트 HTTP 환경에서 MCP 서버를 작동시킬 수 있습니다.
+- GitHub Copilot에 로컬 혹은 리모트 MCP 서버를 연결시킬 수 있습니다.
 
 ## 사전 준비 사항
 
@@ -37,6 +39,8 @@ save-points/
         ├── .vscode/
         │   ├── mcp.http.local.json
         │   └── mcp.http.remote.json
+        ├── infra/
+        │   └── < bicep files >
         ├── MafWorkshop.sln
         └── MafWorkshop.McpTodo/
             ├── Properties/
@@ -49,23 +53,25 @@ save-points/
 
 > 프로젝트 소개:
 >
+> - `.vscode`: MCP 서버 실행용 설정 파일 디렉토리
+> - `infra`: Azure 클라우드 리소스 배포용 bicep 파일 디렉토리
 > - `MafWorkshop.McpTodo`: To-do 리스트 관리용 MCP 서버 프로젝트
 
-1. 앞서 실습한 `workshop` 디렉토리가 있다면 삭제하거나 다른 이름으로 바꿔주세요. 예) `workshop-step-03`
+1. 앞서 실습한 `workshop` 디렉토리가 있다면 삭제하거나 다른 이름으로 바꿔주세요. 예) `workshop-step-04`
 1. 터미널을 열고 아래 명령어를 차례로 실행시켜 실습 디렉토리를 만들고 시작 프로젝트를 복사합니다.
 
     ```bash
     # zsh/bash
     rm -rf $REPOSITORY_ROOT/workshop && \
         mkdir -p $REPOSITORY_ROOT/workshop && \
-        cp -a $REPOSITORY_ROOT/save-points/step-04/start/. $REPOSITORY_ROOT/workshop/
+        cp -a $REPOSITORY_ROOT/save-points/step-05/start/. $REPOSITORY_ROOT/workshop/
     ```
 
     ```powershell
     # PowerShell
     Remove-Item -Path $REPOSITORY_ROOT/workshop -Recurse -Force && `
         New-Item -Type Directory -Path $REPOSITORY_ROOT/workshop -Force && `
-        Copy-Item -Path $REPOSITORY_ROOT/save-points/step-04/start/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
+        Copy-Item -Path $REPOSITORY_ROOT/save-points/step-05/start/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
     ```
 
 ## 시작 프로젝트 빌드 및 실행
@@ -90,7 +96,7 @@ save-points/
     cd $REPOSITORY_ROOT/workshop
     ```
 
-1. `./MafWorkshop.McpTodo/Program.cs` 파일을 열고 `// MCP 서버 추가하기` 주석을 찾아 아래 내용을 추가합니다.
+1. `./MafWorkshop.McpTodo/Program.cs` 파일을 열고 `// MCP 서버 추가하기` 주석을 찾아 아래 내용을 추가합니다. MCP 서비스를 HTTP 형식의 의존성 개체로 등록합니다.
 
     ```csharp
     // MCP 서버 추가하기
@@ -99,7 +105,7 @@ save-points/
                     .WithToolsFromAssembly(Assembly.GetEntryAssembly());
     ```
 
-1. 같은 파일에서 `// MCP 엔드포인트 미들웨어 추가하기` 주석을 찾아 아래와 같이 입력합니다.
+1. 같은 파일에서 `// MCP 엔드포인트 미들웨어 추가하기` 주석을 찾아 아래와 같이 입력합니다. MCP 서버의 엔드포인트를 등록합니다.
 
     ```csharp
     // MCP 엔드포인트 미들웨어 추가하기
@@ -114,7 +120,7 @@ save-points/
     cd $REPOSITORY_ROOT/workshop
     ```
 
-1. `./MafWorkshop.McpTodo/Program.cs` 파일을 열고 `// Todo Tool 추가하기` 주석을 찾아 아래 내용을 추가합니다.
+1. `./MafWorkshop.McpTodo/Program.cs` 파일을 열고 `// Todo Tool 추가하기` 주석을 찾아 아래 내용을 추가합니다. LLM이 이 MCP 서버를 통해 활용할 수 있는 도구를 작성합니다.
 
     ```csharp
     // Todo Tool 추가하기
@@ -240,11 +246,11 @@ save-points/
 
 1. 오른쪽 익스텐션 아이콘을 클릭한 후 MCP 서버 섹션을 보면 `todo-list` MCP 서버가 보입니다. 톱니바퀴 모양을 클릭한 후 `Start Server` 메뉴를 클릭해서 MCP 서버를 실행시킵니다.
 
-   ![GitHub Copilot - MCP 서버 실행](./images/step-04-image-01.png)
+   ![GitHub Copilot - MCP 서버 실행](./images/step-05-image-01.png)
 
 1. GitHub Copilot 창을 열어 아래와 같이 `todo-list` MCP 서버를 선택했는지 확인합니다.
 
-   ![GitHub Copilot - MCP 서버 선택](./images/step-04-image-02.png)
+   ![GitHub Copilot - MCP 서버 선택](./images/step-05-image-02.png)
 
 1. GitHub Copilot 창에서 아래와 비슷한 프롬프트를 전송합니다.
 
@@ -253,15 +259,15 @@ save-points/
     - 오후 2시 미팅 추가해줘
     ```
 
-   ![GitHub Copilot - MCP 서버 실행](./images/step-04-image-03.png)
+   ![GitHub Copilot - MCP 서버 실행](./images/step-05-image-03.png)
 
 1. GitHub Copilot이 `todo-list` MCP 서버를 잘 실행시켜 원하는 작업을 수행했는지 확인합니다.
 
-   ![GitHub Copilot - MCP 서버 실행 결과](./images/step-04-image-04.png)
+   ![GitHub Copilot - MCP 서버 실행 결과](./images/step-05-image-04.png)
 
 1. 오른쪽 익스텐션 아이콘을 클릭한 후 MCP 서버 섹션을 보면 `todo-list` MCP 서버가 보입니다. 톱니바퀴 모양을 클릭한 후 `Stop Server` 메뉴를 클릭해서 MCP 서버를 종료합니다.
 
-   ![GitHub Copilot - MCP 서버 종료](./images/step-04-image-05.png)
+   ![GitHub Copilot - MCP 서버 종료](./images/step-05-image-05.png)
 
 1. 터미널에서 `CTRL`+`C` 키를 눌러 애플리케이션 실행을 종료합니다.
 
@@ -283,8 +289,8 @@ save-points/
 
    아래와 같은 질문이 나오면 적당하게 입력합니다.
 
-   - `? Enter a unique environment name:` 👉 환경 이름 (예: mafworkshop-2026)
-   - `? Enter a value for the 'location' infrastructure parameter:` 👉 지역 선택 (예: Korea Central)
+   - `? Enter a unique environment name:` 👉 환경 이름 (예: `mafworkshop-2026`)
+   - `? Enter a value for the 'location' infrastructure parameter:` 👉 지역 선택 (예: `Korea Central`)
 
    잠시 기다리면 MCP 서버를 배포한 Azure Container Apps 인스턴스가 만들어진 것을 확인할 수 있습니다.
 
@@ -310,15 +316,15 @@ save-points/
 
 1. 오른쪽 익스텐션 아이콘을 클릭한 후 MCP 서버 섹션을 보면 `todo-list` MCP 서버가 보입니다. 톱니바퀴 모양을 클릭한 후 `Start Server` 메뉴를 클릭해서 MCP 서버를 실행시킵니다.
 
-   ![GitHub Copilot - MCP 서버 실행](./images/step-04-image-01.png)
+   ![GitHub Copilot - MCP 서버 실행](./images/step-05-image-01.png)
 
    서버를 실행시키는 과정에서 아래와 같이 리모트 서버의 주소를 물어봅니다. 이 때 앞서 확인했던 리모트 MCP 서버의 주소를 입력하세요.
 
-   ![GitHub Copilot - MCP 서버 실행 - 리모트 서버 주소 입력](./images/step-04-image-06.png)
+   ![GitHub Copilot - MCP 서버 실행 - 리모트 서버 주소 입력](./images/step-05-image-06.png)
 
 1. GitHub Copilot 창을 열어 아래와 같이 `todo-list` MCP 서버를 선택했는지 확인합니다.
 
-   ![GitHub Copilot - MCP 서버 선택](./images/step-04-image-02.png)
+   ![GitHub Copilot - MCP 서버 선택](./images/step-05-image-02.png)
 
 1. GitHub Copilot 창에서 아래와 비슷한 프롬프트를 전송합니다.
 
@@ -327,21 +333,21 @@ save-points/
     - 오후 2시 미팅 추가해줘
     ```
 
-   ![GitHub Copilot - MCP 서버 실행](./images/step-04-image-03.png)
+   ![GitHub Copilot - MCP 서버 실행](./images/step-05-image-03.png)
 
 1. GitHub Copilot이 `todo-list` MCP 서버를 잘 실행시켜 원하는 작업을 수행했는지 확인합니다.
 
-   ![GitHub Copilot - MCP 서버 실행 결과](./images/step-04-image-04.png)
+   ![GitHub Copilot - MCP 서버 실행 결과](./images/step-05-image-04.png)
 
 1. 오른쪽 익스텐션 아이콘을 클릭한 후 MCP 서버 섹션을 보면 `todo-list` MCP 서버가 보입니다. 톱니바퀴 모양을 클릭한 후 `Stop Server` 메뉴를 클릭해서 MCP 서버를 종료합니다.
 
-   ![GitHub Copilot - MCP 서버 종료](./images/step-04-image-05.png)
+   ![GitHub Copilot - MCP 서버 종료](./images/step-05-image-05.png)
 
 ## 완성본 결과 확인
 
-이 세션의 완성본은 `$REPOSITORY_ROOT/save-points/step-04/complete`에서 확인할 수 있습니다.
+이 세션의 완성본은 `$REPOSITORY_ROOT/save-points/step-05/complete`에서 확인할 수 있습니다.
 
-1. 앞서 실습한 `workshop` 디렉토리가 있다면 삭제하거나 다른 이름으로 바꿔주세요. 예) `workshop-step-04`
+1. 앞서 실습한 `workshop` 디렉토리가 있다면 삭제하거나 다른 이름으로 바꿔주세요. 예) `workshop-step-05`
 1. 터미널을 열고 아래 명령어를 차례로 실행시켜 실습 디렉토리를 만들고 시작 프로젝트를 복사합니다.
 
     ```bash
@@ -369,4 +375,4 @@ save-points/
 
 축하합니다! 에이전트에 사용하기 위한 MCP 서버를 직접 개발했습니다. 이제 다음 단계로 이동하세요!
 
-👈 [03: Aspire로 프론트엔드 웹 UI와 백엔드 에이전트 오케스트레이션하기](./03-aspire-orchestration.md) | [05: Microsoft Agent Framework에 MCP 서버 연동하기](./05-mcp-server-integration-with-maf.md) 👉
+👈 [04: Aspire로 프론트엔드 웹 UI와 백엔드 에이전트 오케스트레이션하기](./04-aspire-orchestration.md) | [06: Microsoft Agent Framework에 MCP 서버 연동하기](./06-mcp-server-integration-with-maf.md) 👉

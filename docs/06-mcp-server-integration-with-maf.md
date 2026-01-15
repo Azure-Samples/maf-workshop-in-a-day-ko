@@ -1,15 +1,16 @@
-# 05: Microsoft Agent Framework에 MCP 서버 연동하기
+# 06: Microsoft Agent Framework에 MCP 서버 연동하기
 
-이 세션에서는 [앞서 만들었던](./04-mcp-server-development.md) MCP 서버를 Microsoft Agent Framework에 연동합니다.
+이 세션에서는 앞서 만들었던 [MCP 서버](./05-mcp-server-development.md)를 Microsoft Agent Framework의 백엔드 에이전트에 연동합니다.
 
 ## 세션 목표
 
 - MCP 서버를 Microsoft Agent Framework에 연동시킬 수 있습니다.
+- Aspire를 이용해서 프론트엔드 웹 UI와 백엔드 에이전트, LLM 커넥션 및 MCP 서버를 오케스트레이션할 수 있습니다.
+- 전체 애플리케이션을 Azure 클라우드로 배포할 수 있습니다.
 
 ## 사전 준비 사항
 
 - 이전 [00: 개발 환경 설정](./00-setup.md)에서 개발 환경을 모두 설정한 상태라고 가정합니다.
-- 이전 [04: MCP 서버 개발하기](./04-mcp-server-development.md)에서 MCP 서버 개발을 완성한 상태라고 가정합니다.
 
 ## 리포지토리 루트 설정
 
@@ -33,9 +34,6 @@
 save-points/
 └── step-03/
     └── start/
-        ├── .vscode/
-        │   ├── mcp.http.local.json
-        │   └── mcp.http.remote.json
         ├── MafWorkshop.sln
         ├── MafWorkshop.Agent/
         │   ├── Properties/
@@ -47,6 +45,7 @@ save-points/
         │   ├── Properties/
         │   │   └── launchSettings.json
         │   ├── TodoDbContext.cs
+        │   ├── TodoTool.cs
         │   ├── Program.cs
         │   ├── appsettings.json
         │   └── MafWorkshop.McpTodo.csproj
@@ -63,6 +62,7 @@ save-points/
         ├── MafWorkshop.AppHost/
         │   ├── Properties/
         │   │   └── launchSettings.json
+        │   ├── LlmResourceFactory.cs
         │   ├── Program.cs
         │   ├── appsettings.json
         │   └── MafWorkshop.AppHost.csproj
@@ -79,21 +79,21 @@ save-points/
 > - `MafWorkshop.AppHost`: Aspire 오케스트레이션 프로젝트
 > - `MafWorkshop.ServiceDefaults`: Aspire Observability 및 Traceability 확장 프로젝트
 
-1. 앞서 실습한 `workshop` 디렉토리가 있다면 삭제하거나 다른 이름으로 바꿔주세요. 예) `workshop-step-04`
+1. 앞서 실습한 `workshop` 디렉토리가 있다면 삭제하거나 다른 이름으로 바꿔주세요. 예) `workshop-step-05`
 1. 터미널을 열고 아래 명령어를 차례로 실행시켜 실습 디렉토리를 만들고 시작 프로젝트를 복사합니다.
 
     ```bash
     # zsh/bash
     rm -rf $REPOSITORY_ROOT/workshop && \
         mkdir -p $REPOSITORY_ROOT/workshop && \
-        cp -a $REPOSITORY_ROOT/save-points/step-05/start/. $REPOSITORY_ROOT/workshop/
+        cp -a $REPOSITORY_ROOT/save-points/step-06/start/. $REPOSITORY_ROOT/workshop/
     ```
 
     ```powershell
     # PowerShell
     Remove-Item -Path $REPOSITORY_ROOT/workshop -Recurse -Force && `
         New-Item -Type Directory -Path $REPOSITORY_ROOT/workshop -Force && `
-        Copy-Item -Path $REPOSITORY_ROOT/save-points/step-05/start/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
+        Copy-Item -Path $REPOSITORY_ROOT/save-points/step-06/start/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
     ```
 
 ## 시작 프로젝트 빌드 및 실행
@@ -118,9 +118,37 @@ save-points/
 
 1. 자동으로 웹 브라우저가 열리면서 아래와 같은 Aspire 대시보드 페이지가 나타나는지 확인합니다.
 
-   ![Aspire 대시보드 페이지 - MCP 서버 연동 전](./images/step-05-image-01.png)
+   ![Aspire 대시보드 페이지 - MCP 서버 연동 전](./images/step-06-image-01.png)
 
 1. 터미널에서 `CTRL`+`C` 키를 눌러 애플리케이션 실행을 종료합니다.
+
+## Observability 및 Traceability 도구 연동 - MCP 서버
+
+1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
+
+    ```bash
+    cd $REPOSITORY_ROOT/workshop
+    ```
+
+1. 아래 명령어를 실행시켜 Observability 및 Traceability 도구를 추가합니다.
+
+    ```bash
+    dotnet add ./MafWorkshop.McpTodo reference ./MafWorkshop.ServiceDefaults
+    ```
+
+1. `./MafWorkshop.McpTodo/Program.cs` 파일을 열고 `// Observability 및 Traceability를 위한 Service Defaults 추가하기` 주석을 찾아 아래 내용을 추가합니다. 이를 통해 다양한 Observability 및 Traceability 기능 관련 인스턴스를 의존성 개체로 등록합니다.
+
+    ```csharp
+    // Observability 및 Traceability를 위한 Service Defaults 추가하기
+    builder.AddServiceDefaults();
+    ```
+
+1. 같은 파일에서 `// Observability 및 Traceability를 위한 미들웨어 설정하기` 주석을 찾아 아래와 같이 입력합니다. 서비스의 가용성 확인을 위한 헬스체크 엔드포인트를 추가하는 미들웨어입니다.
+
+    ```csharp
+    // Observability 및 Traceability를 위한 미들웨어 설정하기
+    app.MapDefaultEndpoints();
+    ```
 
 ## Aspire 오케스트레이션 구성 - 호스트
 
@@ -136,7 +164,7 @@ save-points/
     dotnet add ./MafWorkshop.AppHost reference ./MafWorkshop.McpTodo
     ```
 
-1. `./MafWorkshop.AppHost/AppHost.cs` 파일을 열고 `// MCP Todo 서버 프로젝트 추가하기` 주석을 찾아 아래 내용을 추가합니다.
+1. `./MafWorkshop.AppHost/AppHost.cs` 파일을 열고 `// MCP Todo 서버 프로젝트 추가하기` 주석을 찾아 아래 내용을 추가합니다. MCP 서버 앱을 `mcptodo`라는 리소스로 선언합니다.
 
     ```csharp
     // MCP Todo 서버 프로젝트 추가하기
@@ -144,7 +172,7 @@ save-points/
                          .WithExternalHttpEndpoints();
     ```
 
-1. 같은 파일에서 `// 백엔드 에이전트 프로젝트 수정하기` 주석을 찾아 아래와 같이 변경합니다.
+1. 같은 파일에서 `// 백엔드 에이전트 프로젝트 수정하기` 주석을 찾아 아래와 같이 변경합니다. 백엔드 에이전트 리소스인 `agent`에 방금 작성한 `mcptodo` 리소스를 연결합니다.
 
    **변경전:**
 
@@ -174,7 +202,7 @@ save-points/
     cd $REPOSITORY_ROOT/workshop
     ```
 
-1. `./MafWorkshop.Agent/Program.cs` 파일을 열고 `// HttpClientFactory 등록하기` 주석을 찾아 아래 내용을 추가합니다.
+1. `./MafWorkshop.Agent/Program.cs` 파일을 열고 `// HttpClientFactory 등록하기` 주석을 찾아 아래 내용을 추가합니다. MCP 서버 커넥션을 Aspire의 `AppHost` 프로젝트에서 대신 해결해 주기 때문에 Aspire에서 전달 받은 `IHttpClientFactory` 인스턴스를 의존성 개체로 등록합니다.
 
     ```csharp
     // HttpClientFactory 등록하기
@@ -184,7 +212,7 @@ save-points/
     });
     ```
 
-1. 같은 파일에서 `// MCP 클라이언트 등록하기` 주석을 찾아 아래와 같이 입력합니다.
+1. 같은 파일에서 `// MCP 클라이언트 등록하기` 주석을 찾아 아래와 같이 입력합니다. 앞서 추가한 `IHttpClientFactory` 인스턴스와 함께 `McpClient` 인스턴스도 함꼐 의존성 개체로 등록합니다.
 
     ```csharp
     // MCP 클라이언트 등록하기
@@ -213,7 +241,7 @@ save-points/
     });
     ```
 
-1. 같은 파일에서 `// Manager 에이전트 추가하기` 주석을 찾아 아래와 같이 입력합니다.
+1. 같은 파일에서 `// Manager 에이전트 추가하기` 주석을 찾아 아래와 같이 입력합니다. 여기서는 To-do 리스트를 관리하는 **Manager** 에이전트를 추가하고 이 에이전트는 MCP 서버가 제공하는 Tool을 에이전트가 사용하는 Tool로 사용하도록 설정합니다.
 
     ```csharp
     // Manager 에이전트 추가하기
@@ -244,7 +272,7 @@ save-points/
     );
     ```
 
-1. 같은 파일에서 `// AG-UI 미들웨어 설정하기` 주석을 찾아 아래와 같이 입력합니다.
+1. 같은 파일에서 `// AG-UI 미들웨어 설정하기` 주석을 찾아 아래와 같이 입력합니다. `/ag-ui` 엔드포인트를 통해 프론트엔드 웹 UI와 소통할 수 있도록 설정합니다.
 
     ```csharp
     // AG-UI 미들웨어 설정하기
@@ -276,15 +304,15 @@ save-points/
 
 1. 자동으로 웹 브라우저가 열리면서 아래와 같은 Aspire 대시보드 페이지가 나타나는지 확인합니다.
 
-   ![Aspire 대시보드 페이지 - MCP 서버 연동 후](./images/step-05-image-02.png)
+   ![Aspire 대시보드 페이지 - MCP 서버 연동 후](./images/step-06-image-02.png)
 
 1. 백엔드 에이전트 앱 링크를 클릭해서 Dev UI 화면이 잘 보이는지 확인합니다. 그리고, Manager 에이전트를 선택해서 잘 동작하는지 확인합니다.
 
-   ![Dev UI 페이지 - Manager 에이전트](./images/step-05-image-03.png)
+   ![Dev UI 페이지 - Manager 에이전트](./images/step-06-image-03.png)
 
 1. 프론트엔드 웹 UI 앱 링크를 클릭해서 챗 UI 화면이 잘 보이는지 확인합니다. 그리고, 메시지를 입력해서 결과를 잘 출력하는지 확인합니다.
 
-   ![웹 UI 페이지](./images/step-05-image-04.png)
+   ![웹 UI 페이지](./images/step-06-image-04.png)
 
 1. 터미널에서 `CTRL`+`C` 키를 눌러 애플리케이션 실행을 종료합니다.
 
@@ -306,15 +334,13 @@ save-points/
 
    아래와 같은 질문이 나오면 적당하게 입력합니다.
 
-   - `? Enter a unique environment name:` 👉 환경 이름 (예: mafworkshop-2026)
-   - `? Enter a value for the 'aiLlmProvider' infrastructure parameter:` 👉 LLM 제공자 선택 - `AzureOpenAI` 또는 `GitHubModels` 선택
+   - `? Enter a unique environment name:` 👉 환경 이름 (예: `mafworkshop-2026`)
    - `? Enter a value for the 'apiKey' infrastructure secured parameter:` 👉 API 키 값 입력
-   - `? Enter a value for the 'endpoint' infrastructure parameter:` 👉 LLM 엔드포인트 입력 - GitHub Models 선택할 경우 건너뛰기 기능
-   - `? Enter a value for the 'location' infrastructure parameter:` 👉 지역 선택 (예: Korea Central)
+   - `? Enter a value for the 'location' infrastructure parameter:` 👉 지역 선택 (예: `Korea Central`)
 
    잠시 기다리면 프론트엔드 웹 UI, 백엔드 에이전트 및 MCP 서버를 배포한 Azure Container Apps 인스턴스가 각각 만들어진 것을 확인할 수 있습니다.
 
-   ![애플리케이션 배포 결과](./images/step-05-image-05.png)
+   ![애플리케이션 배포 결과](./images/step-06-image-05.png)
 
 1. 위 스크린샷의 `webui` 링크를 클릭해서 웹 UI 화면이 나오면 아래와 비슷하게 프롬프트를 입력한 후 결과를 확인합니다.
 
@@ -323,25 +349,25 @@ save-points/
     - 오후 2시 미팅 추가해줘
     ```
 
-   ![애플리케이션 실행 결과](./images/step-05-image-06.png)
+   ![애플리케이션 실행 결과](./images/step-06-image-06.png)
 
 ## 완성본 결과 확인
 
-이 세션의 완성본은 `$REPOSITORY_ROOT/save-points/step-05/complete`에서 확인할 수 있습니다.
+이 세션의 완성본은 `$REPOSITORY_ROOT/save-points/step-06/complete`에서 확인할 수 있습니다.
 
-1. 앞서 실습한 `workshop` 디렉토리가 있다면 삭제하거나 다른 이름으로 바꿔주세요. 예) `workshop-step-05`
+1. 앞서 실습한 `workshop` 디렉토리가 있다면 삭제하거나 다른 이름으로 바꿔주세요. 예) `workshop-step-06`
 1. 터미널을 열고 아래 명령어를 차례로 실행시켜 실습 디렉토리를 만들고 시작 프로젝트를 복사합니다.
 
     ```bash
     # zsh/bash
     mkdir -p $REPOSITORY_ROOT/workshop && \
-        cp -a $REPOSITORY_ROOT/save-points/step-05/complete/. $REPOSITORY_ROOT/workshop/
+        cp -a $REPOSITORY_ROOT/save-points/step-06/complete/. $REPOSITORY_ROOT/workshop/
     ```
 
     ```powershell
     # PowerShell
     New-Item -Type Directory -Path $REPOSITORY_ROOT/workshop -Force && `
-        Copy-Item -Path $REPOSITORY_ROOT/save-points/step-05/complete/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
+        Copy-Item -Path $REPOSITORY_ROOT/save-points/step-06/complete/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
     ```
 
 1. 워크샵 디렉토리로 이동합니다.
@@ -357,4 +383,4 @@ save-points/
 
 축하합니다! 백엔드 에이전트에 MCP 서버를 직접 연동해 봤습니다. 이제 다음 단계로 이동하세요!
 
-👈 [04: MCP 서버 개발하기](./04-mcp-server-development.md) | [06: Copilot Studio에서 에이전트 개발하고 MCP 서버 연동하기](./06-mcp-server-integration-with-copilot-studio.md) 👉
+👈 [05: MCP 서버 개발하기](./05-mcp-server-development.md) | [07: Copilot Studio에서 에이전트 개발하고 MCP 서버 연동하기](./07-mcp-server-integration-with-copilot-studio.md) 👉

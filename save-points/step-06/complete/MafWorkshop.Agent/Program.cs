@@ -65,7 +65,7 @@ builder.AddAIAgent(
                 When I ask you to remove an item, delete it from the list.
                 When I ask you to clear the list, remove all items.
                 """,
-            tools: [.. tools]
+            tools: [.. tools ]
         );
 
         return agent;

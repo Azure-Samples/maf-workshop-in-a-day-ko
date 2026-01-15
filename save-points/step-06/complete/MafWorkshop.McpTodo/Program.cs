@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Observability 및 Traceability를 위한 Service Defaults 추가하기
+builder.AddServiceDefaults();
+
 var connection = new SqliteConnection("Filename=:memory:");
 connection.Open();
 
@@ -20,6 +23,9 @@ builder.Services.AddMcpServer()
                 .WithToolsFromAssembly(Assembly.GetEntryAssembly());
 
 var app = builder.Build();
+
+// Observability 및 Traceability를 위한 미들웨어 설정하기
+app.MapDefaultEndpoints();
 
 using (var scope = app.Services.CreateScope())
 {

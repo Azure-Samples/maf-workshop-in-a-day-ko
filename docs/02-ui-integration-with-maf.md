@@ -1,6 +1,6 @@
 # 02: Microsoft Agent Framework에 프론트엔드 UI 연동하기
 
-이 세션에서는 Microsoft Agent Framework로 만들어진 백엔드 에이전트에 [AG-UI 프로토콜](https://docs.ag-ui.com/introduction)을 활용해서 웹 UI를 연동합니다.
+이 세션에서는 Microsoft Agent Framework로 만들어진 백엔드 에이전트에 [AG-UI 프로토콜](https://docs.ag-ui.com/introduction)을 활용해서 프론트엔드 웹 UI를 연동합니다.
 
 ## 세션 목표
 
@@ -87,12 +87,6 @@ save-points/
     dotnet restore && dotnet build
     ```
 
-1. 백엔드 에이전트 애플리케이션을 실행합니다.
-
-    ```bash
-    dotnet run --project ./MafWorkshop.Agent
-    ```
-
 1. 다른 터미널을 열고 프론트엔드 UI 애플리케이션을 실행합니다.
 
     ```bash
@@ -103,11 +97,11 @@ save-points/
 
    ![웹 UI 페이지](./images/step-02-image-01.png)
 
-   아무 메시지나 넣고 아래와 같은 응답이 나오는 것을 확인합니다.
+   아무 메시지나 넣고 아래와 같이 가짜 응답이 나오는 것을 확인합니다.
 
    ![웹 UI 페이지 - 가짜 응답](./images/step-02-image-02.png)
 
-1. 두 터미널에서 각각 `CTRL`+`C` 키를 눌러 모든 애플리케이션 실행을 종료합니다.
+1. 터미널에서 `CTRL`+`C` 키를 눌러 애플리케이션 실행을 종료합니다.
 
 ## 백엔드 에이전트 앱 AG-UI 프로토콜 연동
 
@@ -117,20 +111,30 @@ save-points/
     cd $REPOSITORY_ROOT/workshop
     ```
 
-1. `./MafWorkshop.Agent/Program.cs` 파일을 열고 `// AG-UI 등록하기` 주석을 찾아 아래 내용을 추가합니다.
+1. `./MafWorkshop.Agent/appsettings.json` 파일을 열고 `LlmProvider` 값이 `GitHubModels`인지 확인합니다. 만약 다른 값으로 되어 있으면 `GitHubModels`로 변경합니다.
+
+    ```jsonc
+    {
+      "LlmProvider": "GitHubModels"
+    }
+    ```
+
+   > **Azure 구독이 있는 경우**, `GitHubModels` 대신 `AzureOpenAI`로도 바꿔보세요.
+
+1. `./MafWorkshop.Agent/Program.cs` 파일을 열고 `// AG-UI 등록하기` 주석을 찾아 아래 내용을 추가합니다. 에이전트 앱에 AG-UI 서비스를 사용할 수 있는 서비스 인스턴스를 별도로 로직을 구현하지 않고 직접 의존성 개체로 등록합니다.
 
     ```csharp
     // AG-UI 등록하기
     builder.Services.AddAGUI();
     ```
 
-1. 같은 파일에서 `// AG-UI 미들웨어 설정하기` 주석을 찾아 아래와 같이 입력합니다. 백엔드 에이전트 앱에 `/ag-ui` 엔드포인트를 추가해서 Publisher 워크플로우를 에이전트로 연걸했습니다.
+1. 같은 파일에서 `// AG-UI 미들웨어 설정하기` 주석을 찾아 아래와 같이 입력합니다. 이 미들웨어를 통해 백엔드 에이전트 앱에 `/ag-ui` 엔드포인트를 추가한 후 이 엔드포인트를 Writer 에이전트로 연결합니다.
 
     ```csharp
     // AG-UI 미들웨어 설정하기
     app.MapAGUI(
         pattern: "ag-ui",
-        aiAgent: app.Services.GetRequiredKeyedService<AIAgent>("publisher")
+        aiAgent: app.Services.GetRequiredKeyedService<AIAgent>("writer")
     );
     ```
 
@@ -142,7 +146,18 @@ save-points/
     cd $REPOSITORY_ROOT/workshop
     ```
 
-1. `./MafWorkshop.WebUI/Program.cs` 파일을 열고 `// HttpClientFactory 등록하기` 주석을 찾아 아래 내용을 추가합니다. `HttpClient` 인스턴스를 `agent`라는 이름으로 등록했습니다.
+1. `./MafWorkshop.WebUI/appsettings.json` 파일을 열고 `AgentEndpoints` 섹션에 아래와 같은 값이 있는지 확인합니다. 만약 아니라면, 아래와 같이 맞춰주세요.
+
+    ```jsonc
+    {
+      "AgentEndpoints": {
+        "Https": "https://localhost:45097",
+        "http": "http://localhost:5097"
+      }
+    }
+    ```
+
+1. `./MafWorkshop.WebUI/Program.cs` 파일을 열고 `// HttpClientFactory 등록하기` 주석을 찾아 아래 내용을 추가합니다. `HttpClient` 인스턴스를 `agent`라는 이름으로 등록해서 백엔드 에이전트 애플리케이션을 찾습니다.
 
     ```csharp
     // HttpClientFactory 등록하기
@@ -155,14 +170,14 @@ save-points/
     });
     ```
 
-1. 같은 파일에서 `// // AG-UI 연동 IChatClient 인스턴스 등록하기` 주석을 찾아 아래와 같은지 확인합니다.
+1. 같은 파일에서 `// AG-UI 연동 IChatClient 인스턴스 등록하기` 주석을 찾아 아래와 같은지 확인합니다. 현재 가짜 응답을 생성하는 `FakeChatClient`를 연결한 상태입니다.
 
     ```csharp
     // AG-UI 연동 IChatClient 인스턴스 등록하기
     builder.Services.AddChatClient(new FakeChatClient());
     ```
 
-   이를 아래와 같이 수정합니다. 백엔드 에이전트 앱의 `/ag-ui` 엔드포인트에 앞서 등록한 `agent` 이름의 `HttpClient` 인스턴스를 연결했습니다.
+   이를 아래와 같이 수정합니다. 백엔드 에이전트 앱의 `/ag-ui` 엔드포인트에 앞서 등록한 `agent` 이름의 `HttpClient` 인스턴스를 연결합니다.
 
     ```csharp
     // AG-UI 연동 IChatClient 인스턴스 등록하기
@@ -170,93 +185,6 @@ save-points/
         httpClient: sp.GetRequiredService<IHttpClientFactory>().CreateClient("agent"),
         endpoint: "ag-ui")
     );
-    ```
-
-## UI 컴포넌트 수정
-
-1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
-
-    ```bash
-    cd $REPOSITORY_ROOT/workshop
-    ```
-
-1. `./MafWorkshop.WebUI/Components/Pages/Chat/Chat.razor` 파일을 열고 `// GetStreamingResponseAsync() 메서드 원본 삭제하기` 주석을 찾아 바로 아래에 있는 메서드를 삭제합니다.
-
-    **삭제전:**
-
-    ```csharp
-    // GetStreamingResponseAsync() 메서드 원본 삭제하기
-    private async Task GetStreamingResponseAsync(TextContent responseText, ChatMessage responseMessage, CancellationToken cancellationToken)
-    {
-        await foreach (var update in ChatClient.GetStreamingResponseAsync(messages.Skip(statefulMessageCount), chatOptions, cancellationToken))
-        {
-            await Task.Delay(50);
-
-            messages.AddMessages(update, filter: c => c is not TextContent);
-            responseText.Text += update.Text;
-            chatOptions.ConversationId = update.ConversationId;
-            ChatMessageItem.NotifyChanged(responseMessage);
-
-            StateHasChanged();
-        }
-    }
-    ```
-
-    **삭제후:** 주석만 남아있습니다.
-
-    ```csharp
-    // GetStreamingResponseAsync() 메서드 원본 삭제하기
-    ```
-
-1. 같은 파일에서 `// GetStreamingResponseAsync() 메서드 리팩토링하기` 주석을 찾아 아래와 같이 입력합니다.
-
-    ```csharp
-    // GetStreamingResponseAsync() 메서드 리팩토링하기
-    private async Task GetStreamingResponseAsync(TextContent responseText, ChatMessage responseMessage, CancellationToken cancellationToken)
-    {
-        var deferAssistantTextUntilToolResponse = false;
-        var toolResponseSeen = false;
-        await foreach (var update in ChatClient.GetStreamingResponseAsync(messages.Skip(statefulMessageCount), chatOptions, cancellationToken))
-        {
-            await Task.Delay(50);
-
-            messages.AddMessages(update, filter: c => c is not TextContent);
-
-            if (deferAssistantTextUntilToolResponse == false && update.Role == ChatRole.Assistant && ContainsNonTextContent(update))
-            {
-                deferAssistantTextUntilToolResponse = true;
-            }
-
-            if (update.Role == ChatRole.Tool)
-            {
-                toolResponseSeen = true;
-            }
-
-            if ((deferAssistantTextUntilToolResponse == false || toolResponseSeen == true) && update.Role == ChatRole.Assistant)
-            {
-                responseText.Text += update.Text;
-                ChatMessageItem.NotifyChanged(responseMessage);
-            }
-
-            chatOptions.ConversationId = update.ConversationId;
-            StateHasChanged();
-        }
-
-        bool ContainsNonTextContent(ChatResponseUpdate update)
-        {
-            if (update.Contents.Any() == false)
-            {
-                return true;
-            }
-
-            if (update.Contents.Any(c => c is not TextContent) == true)
-            {
-                return true;
-            }
-
-            return false;
-        }
-    }
     ```
 
 ## 애플리케이션 빌드 및 실행
@@ -320,30 +248,10 @@ save-points/
     cd $REPOSITORY_ROOT/workshop
     ```
 
-1. 백엔드 에이전트 애플리케이션을 실행합니다.
-
-    ```bash
-    dotnet run --project ./MafWorkshop.Agent
-    ```
-
-1. 다른 터미널을 열고 프론트엔드 UI 애플리케이션을 실행합니다.
-
-    ```bash
-    dotnet watch run --project ./MafWorkshop.WebUI
-    ```
-
-1. 자동으로 웹 브라우저가 열리면서 아래와 같은 챗 UI 페이지가 나타나는지 확인합니다.
-
-   ![웹 UI 페이지](./images/step-02-image-01.png)
-
-   아무 문장이나 입력한 후 결과를 확인합니다.
-
-   ![웹 UI 페이지 - 결과 확인](./images/step-02-image-03.png)
-
-1. 두 터미널에서 각각 `CTRL`+`C` 키를 눌러 모든 애플리케이션 실행을 종료합니다.
+1. [애플리케이션 빌드 및 실행](#애플리케이션-빌드-및-실행) 섹션을 따라합니다.
 
 ---
 
 축하합니다! 에이전트 백엔드에 AG-UI 프로토콜을 활용해서 프론트엔드를 연결했습니다. 이제 다음 단계로 이동하세요!
 
-👈 [01: Microsoft Agent Framework 사용해서 에이전트 개발하기](./01-agent-with-maf.md) | [03: Aspire로 프론트엔드 웹 UI와 백엔드 에이전트 오케스트레이션하기](./03-aspire-orchestration.md) 👉
+👈 [01: Microsoft Agent Framework 사용해서 단일 에이전트 개발하기](./01-single-agent-with-maf.md) | [03: Microsoft Agent Framework 사용해서 다중 에이전트 개발하기](./03-multi-agent-with-maf.md) 👉

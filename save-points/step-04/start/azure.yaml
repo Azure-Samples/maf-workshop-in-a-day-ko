@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: maf-workshop-in-a-day-ko
+
+metadata:
+  template: maf-workshop-in-a-day-ko@1.0.0
+  author: Justin Yoo
+  description: All-in-One deployment using Azure Developer CLI
+
+services:  
+  app:
+    language: dotnet
+    project: ./MafWorkshop.AppHost/MafWorkshop.AppHost.csproj
+    host: containerapp

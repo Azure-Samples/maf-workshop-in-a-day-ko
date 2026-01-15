@@ -1,13 +1,12 @@
-# 01: Microsoft Agent Framework 사용해서 에이전트 개발하기
+# 03: Microsoft Agent Framework 사용해서 다중 에이전트 개발하기
 
-이 세션에서는 Microsoft Agent Framework를 사용해서 백엔드 에이전트를 개발합니다.
+이 세션에서는 Microsoft Agent Framework를 사용해서 다중 에이전트 백엔드 애플리케이션을 개발합니다.
 
 ## 세션 목표
 
-- Microsoft Agent Framework에 다양한 LLM을 연결할 수 있습니다.
-- Microsoft Agent Framework에 단일 에이전트를 붙일 수 있습니다.
-- Microsoft Agent Framework에 다중 에이전트를 붙여 에이전트 워크플로우를 구성할 수 있습니다.
-- Microsoft Agent Framework에서 동작하는 에이전트의 흐름을 시각화할 수 있습니다.
+- Microsoft Agent Framework에 다중 에이전트를 설정하여 에이전트 워크플로우를 구성할 수 있습니다.
+- Microsoft Agent Framework에서 동작하는 다중 에이전트의 흐름을 시각화할 수 있습니다.
+- Microsoft Agent Framework에서 동작하는 다중 에이전트의 응답을 필터링할 수 있습니다.
 
 ## 사전 준비 사항
 
@@ -36,54 +35,47 @@ save-points/
 └── step-01/
     └── start/
         ├── MafWorkshop.sln
-        └── MafWorkshop.Agent/
+        ├── MafWorkshop.Agent/
+        │   ├── Properties/
+        │   │   └── launchSettings.json
+        │   ├── Program.cs
+        │   ├── appsettings.json
+        │   └── MafWorkshop.Agent.csproj
+        └── MafWorkshop.WebUI/
             ├── Properties/
             │   └── launchSettings.json
+            ├── Components/
+            │   └── < Razor component files >
+            ├── wwwroot/
+            │   └── < HTML/CSS/JS files >
             ├── Program.cs
             ├── appsettings.json
-            └── MafWorkshop.Agent.csproj
+            └── MafWorkshop.WebUI.csproj
 ```
 
 > 프로젝트 소개:
 >
 > - `MafWorkshop.Agent`: 백엔드 에이전트 애플리케이션 프로젝트
+> - `MafWorkshop.WebUI`: 프론트엔드 웹 UI 애플리케이션 프로젝트
 
+1. 앞서 실습한 `workshop` 디렉토리가 있다면 삭제하거나 다른 이름으로 바꿔주세요. 예) `workshop-step-02`
 1. 터미널을 열고 아래 명령어를 차례로 실행시켜 실습 디렉토리를 만들고 시작 프로젝트를 복사합니다.
 
     ```bash
     # zsh/bash
     mkdir -p $REPOSITORY_ROOT/workshop && \
-        cp -a $REPOSITORY_ROOT/save-points/step-01/start/. $REPOSITORY_ROOT/workshop/
+        cp -a $REPOSITORY_ROOT/save-points/step-03/start/. $REPOSITORY_ROOT/workshop/
     ```
 
     ```powershell
     # PowerShell
     New-Item -Type Directory -Path $REPOSITORY_ROOT/workshop -Force && `
-        Copy-Item -Path $REPOSITORY_ROOT/save-points/step-01/start/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
-    ```
-
-## LLM 접근 권한 설정
-
-이전 [00: 개발 환경 설정](./00-setup.md)에서 GitHub Models 접근을 위한 PAT과 Azure OpenAI 인스턴스 생성 후 접근을 위한 API 키를 생성했습니다. 이를 애플리케이션에서 사용할 수 있도록 합니다.
-
-1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
-
-    ```bash
-    cd $REPOSITORY_ROOT/workshop
-    ```
-
-1. 아래 명령어를 실행시켜 앞서 생성한 값을 저장합니다.
-
-    ```bash
-    # Azure OpenAI
-    dotnet user-secrets --project ./MafWorkshop.Agent set Azure:OpenAI:Endpoint $endpoint
-    dotnet user-secrets --project ./MafWorkshop.Agent set Azure:OpenAI:ApiKey $apiKey
-    
-    # GitHub Models
-    dotnet user-secrets --project ./MafWorkshop.Agent set GitHub:Token $githubToken
+        Copy-Item -Path $REPOSITORY_ROOT/save-points/step-03/start/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
     ```
 
 ## 시작 프로젝트 빌드 및 실행
+
+> 현재 시작 프로젝트는 단일 에이전트로만 구성해 둔 상태입니다.
 
 1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
 
@@ -97,197 +89,29 @@ save-points/
     dotnet restore && dotnet build
     ```
 
-1. 애플리케이션을 실행합니다.
-
-    ```bash
-    dotnet watch run --project ./MafWorkshop.Agent
-    ```
-
-1. 자동으로 웹 브라우저가 열리면서 404 에러 페이지가 나타나는지 확인합니다.
-
-   ![404 에러페이지](./images/step-01-image-01.png)
-
-   현재 아무것도 추가하지 않았으므로 당연하게 404 에러 페이지가 나타나야 합니다.
-
-1. `CTRL`+`C` 키를 눌러 애플리케이션 실행을 종료합니다.
-
-## LLM 연결
-
-1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
-
-    ```bash
-    cd $REPOSITORY_ROOT/workshop
-    ```
-
-1. `./MafWorkshop.Agent/Program.cs` 파일을 열고 맨 아래로 이동해서 `// ChatClientFactory 클래스 추가하기` 주석을 찾아 아래 내용을 추가합니다.
-
-   > 아래 코드는 `IConfiguration` 인스턴스에서 `LlmProvider` 값을 찾아 그 값이 `AzureOpenAI`이면 Azure OpenAI 연결 정보를 이용해서 `IChatClient` 인스턴스를 생성하고, `GitHubModels`이면 GitHub Models 연결 정보를 이용해서 `IChatClient` 인스턴스를 생성하는 팩토리 메서드 패턴입니다.
-
-    ```csharp
-    // ChatClientFactory 클래스 추가하기
-    public class ChatClientFactory
-    {
-        public static IChatClient CreateChatClient(IConfiguration config)
-        {
-            var provider = config["LlmProvider"] ?? throw new InvalidOperationException("Missing configuration: LlmProvider");
-            IChatClient chatClient = provider switch
-            {
-                "AzureOpenAI" => CreateAzureOpenAIChatClient(config),
-                "GitHubModels" => CreateGitHubModelsChatClient(config),
-                _ => throw new NotSupportedException($"The specified LLM provider '{provider}' is not supported.")
-            };
-    
-            return chatClient;
-        }
-    
-        private static IChatClient CreateAzureOpenAIChatClient(IConfiguration config)
-        {
-            var provider = config["LlmProvider"];
-    
-            var azure = config.GetSection("Azure:OpenAI");
-            var endpoint = azure["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:Endpoint");
-            var apiKey = azure["ApiKey"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:ApiKey");
-            var deploymentName = azure["DeploymentName"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:DeploymentName");
-    
-            Console.WriteLine($"Using {provider}: {deploymentName}");
-    
-            var credential = new ApiKeyCredential(apiKey);
-            var options = new OpenAIClientOptions
-            {
-                Endpoint = new Uri($"{endpoint.TrimEnd('/')}/openai/v1/")
-            };
-    
-            var client = new ResponsesClient(deploymentName, credential, options);
-            var chatClient = client.AsIChatClient();
-    
-            return chatClient;
-        }
-    
-        private static IChatClient CreateGitHubModelsChatClient(IConfiguration config)
-        {
-            var provider = config["LlmProvider"];
-    
-            var github = config.GetSection("GitHub");
-            var endpoint = github["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Endpoint");
-            var token = github["Token"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Token");
-            var model = github["Model"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Model");
-    
-            Console.WriteLine($"Using {provider}: {model}");
-    
-            var credential = new ApiKeyCredential(token);
-            var options = new OpenAIClientOptions()
-            {
-                Endpoint = new Uri(endpoint)
-            };
-    
-            var client = new OpenAIClient(credential, options);
-            var chatClient = client.GetChatClient(model)
-                                   .AsIChatClient();
-    
-            return chatClient;
-        }
-    }
-    ```
-
-1. 같은 파일에서 `// IChatClient 인스턴스 생성하기` 주석을 찾아 아래와 같이 입력합니다.
-
-    ```csharp
-    // IChatClient 인스턴스 생성하기
-    IChatClient? chatClient = ChatClientFactory.CreateChatClient(builder.Configuration);
-    ```
-
-1. 같은 파일에서 `// IChatClient 인스턴스 등록하기` 주석을 찾아 아래와 같이 입력합니다.
-
-    ```csharp
-    // IChatClient 인스턴스 등록하기
-    builder.Services.AddChatClient(chatClient);
-    ```
-
-## 단일 에이전트 생성
-
-1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
-
-    ```bash
-    cd $REPOSITORY_ROOT/workshop
-    ```
-
-1. `./MafWorkshop.Agent/Program.cs` 파일을 열고 `// Writer 에이전트 추가하기` 주석을 찾아 아래와 같이 입력합니다.
-
-    ```csharp
-    // Writer 에이전트 추가하기
-    builder.AddAIAgent(
-        name: "writer",
-        instructions: "You write short stories (300 words or less) about the specified topic."
-    );
-    ```
-
-   > 에이전트는 다양한 방법으로 추가할 수 있지만, 여기서는 가장 간단한 방법으로 에이전트 이름과 페르소나/지침을 입력합니다.
-
-1. 같은 파일에서 `// OpenAI 관련 응답 히스토리 핸들러 등록하기` 주석을 찾아 아래와 같이 입력합니다.
-
-    ```csharp
-    // OpenAI 관련 응답 히스토리 핸들러 등록하기
-    builder.Services.AddOpenAIResponses();
-    builder.Services.AddOpenAIConversations();
-    ```
-
-1. 같은 파일에서 `// OpenAI 관련 응답 히스토리 미들웨어 설정하기` 주석을 찾아 아래와 같이 입력합니다.
-
-    ```csharp
-    // OpenAI 관련 응답 히스토리 미들웨어 설정하기
-    app.MapOpenAIResponses();
-    app.MapOpenAIConversations();
-    ```
-
-## 에이전트 UI 추가
-
-1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
-
-    ```bash
-    cd $REPOSITORY_ROOT/workshop
-    ```
-
-1. `./MafWorkshop.Agent/Program.cs` 파일을 열고 `// DevUI 미들웨어 설정하기` 주석을 찾아 아래와 같이 입력합니다.
-
-    ```csharp
-    if (builder.Environment.IsDevelopment() == false)
-    {
-        app.UseHttpsRedirection();
-    }
-    // DevUI 미들웨어 설정하기
-    else
-    {
-        app.MapDevUI();
-    }
-    ```
-
-1. 애플리케이션을 실행합니다.
+1. 백엔드 에이전트 애플리케이션을 실행합니다.
 
     ```bash
     dotnet run --project ./MafWorkshop.Agent
     ```
 
-1. 터미널에 현재 어떤 LLM을 연결했는지 메시지가 나타나는 것을 확인합니다. 기본값은 GitHub Models 입니다.
+1. 다른 터미널을 열고 프론트엔드 UI 애플리케이션을 실행합니다.
 
-    ```text
-    Using GitHubModels: openai/gpt-5-mini
+    ```bash
+    dotnet watch run --project ./MafWorkshop.WebUI
     ```
 
-   `CTRL`+`C`를 눌러 애플리케이션을 종료하고 `./MafWorkshop.Agent/appsettings.json` 파일을 열어 아래와 같이 `LlmProvider` 값을 `AzureOpenAI`로 바꿔봅니다.
+1. 자동으로 웹 브라우저가 열리면서 아래와 같은 챗 UI 페이지가 나타나는지 확인합니다.
 
-    ```jsonc
-    {
-      // 변경 전
-      "LlmProvider": "GitHubModels",
-    
-      // 변경 후
-      "LlmProvider": "AzureOpenAI",
-    }
-    ```
+   ![웹 UI 페이지](./images/step-03-image-01.png)
 
-   이후 다시 앱을 실행시켜서 이번에는 `Using AzureOpenAI: gpt-5-mini` 메시지가 터미널 화면에 나타나는 것을 확인합니다. 이후 앱을 종료합니다.
+   아무 문장이나 입력한 후 결과를 확인합니다.
 
-## 단일 에이전트 실행
+   ![웹 UI 페이지 - 결과 확인](./images/step-03-image-02.png)
+
+1. 두 터미널에서 각각 `CTRL`+`C` 키를 눌러 모든 애플리케이션 실행을 종료합니다.
+
+## 추가 에이전트 생성
 
 1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
 
@@ -295,31 +119,7 @@ save-points/
     cd $REPOSITORY_ROOT/workshop
     ```
 
-1. 다시 애플리케이션을 실행합니다.
-
-    ```bash
-    dotnet watch run --project ./MafWorkshop.Agent
-    ```
-
-1. 자동으로 웹 브라우저가 열리면서 DevUI 페이지가 나타나는지 확인합니다.
-
-   ![DevUI 페이지 - 단일 에이전트](./images/step-01-image-02.png)
-
-   메시지를 보내고 결과를 확인해 봅니다.
-
-   ![Writer 에이전트 실행 결과](./images/step-01-image-03.png)
-
-1. `CTRL`+`C` 키를 눌러 애플리케이션 실행을 종료합니다.
-
-## 다중 에이전트 워크플로우
-
-1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
-
-    ```bash
-    cd $REPOSITORY_ROOT/workshop
-    ```
-
-1. `./MafWorkshop.Agent/Program.cs` 파일을 열고 `// AgentTools 클래스 추가하기` 주석을 찾아 아래와 같이 입력합니다.
+1. `./MafWorkshop.Agent/Program.cs` 파일을 열고 `// AgentTools 클래스 추가하기` 주석을 찾아 아래와 같이 입력합니다. 추가 에이전트가 활용할 수 있는 도구를 구현합니다.
 
     ```csharp
     // AgentTools 클래스 추가하기
@@ -334,7 +134,7 @@ save-points/
     }
     ```
 
-1. 같은 파일에서 `// Editor 에이전트 추가하기` 주석을 찾아 아래와 같이 입력합니다.
+1. 같은 파일에서 `// Editor 에이전트 추가하기` 주석을 찾아 아래와 같이 입력합니다. 기존의 **Writer** 에이전트가 생성한 스토리를 이 **Editor** 에이전트가 받아 수정하는 역할을 부여합니다. 앞서 작성한 **Writer** 에이전트와 달리 이 **Editor** 에이전트는 에이전트 이름과 지침, 그리고 에이전트가 사용할 수 있는 도구인 `FormatStory`를 위해 별도의 Delegate 함수 형태로 만들어 봅니다.
 
     ```csharp
     // Editor 에이전트 추가하기
@@ -351,9 +151,15 @@ save-points/
     );
     ```
 
-   > 이 에이전트는 에이전트 이름과 지침 그리고 에이전트가 사용할 수 있는 도구를 추가하기 위해 별도의 delegate 함수를 사용했습니다.
+## 다중 에이전트 워크플로우 생성
 
-1. 같은 파일에서 `// Publisher 워크플로우 추가하기` 주석을 찾아 아래와 같이 입력합니다. 아래 코드는 "**Writer**" 에이전트가 사용자의 입력을 받아 일차적으로 처리하고 그 결과물을 "**Editor**" 에이전트가 한 번 교정하는 Sequential 워크플로우입니다. 그리고 마지막에 `.AddAsAIAgent()` 메서드를 추가해서 이 워크플로우 역시 하나의 에이전트로 작동하게끔 구성했습니다.
+1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
+
+    ```bash
+    cd $REPOSITORY_ROOT/workshop
+    ```
+
+1. `./MafWorkshop.Agent/Program.cs` 파일을 열고 `// Publisher 워크플로우 추가하기` 주석을 찾아 아래와 같이 입력합니다. 아래 코드는 "**Writer**" 에이전트가 사용자의 입력을 받아 일차적으로 처리하고 그 결과물을 "**Editor**" 에이전트가 한 번 교정하는 Sequential 워크플로우입니다. 그리고 마지막에 `.AddAsAIAgent()` 메서드를 추가해서 이 워크플로우 역시 하나의 에이전트로 작동하게끔 구성합니다. 이 때 이 Publisher 워크플로우도 앞서 작성했던 Editor 에이전트와 마찬가지로 Delegate 함수 형태를 사용합니다.
 
     ```csharp
     // Publisher 워크플로우 추가하기
@@ -370,7 +176,27 @@ save-points/
     ).AddAsAIAgent();
     ```
 
-   > Publisher 워크플로우도 에이전트 선언과 마찬가지로 이름과 delegate 함수를 사용했습니다.
+1. 같은 파일에서 `// AG-UI 미들웨어 설정하기` 주석을 찾아 아래와 같이 변경합니다. 변경 전에는 AG-UI 엔드포인트가 **Writer** 에이전트를 가리켰지만, 변경 후에는 **Publisher** 워크플로우를 가리키게 됩니다.
+
+   **변경전:**
+
+    ```csharp
+    // AG-UI 미들웨어 설정하기
+    app.MapAGUI(
+        pattern: "ag-ui",
+        aiAgent: app.Services.GetRequiredKeyedService<AIAgent>("writer")
+    );
+    ```
+
+   **변경후:**
+
+    ```csharp
+    // AG-UI 미들웨어 설정하기
+    app.MapAGUI(
+        pattern: "ag-ui",
+        aiAgent: app.Services.GetRequiredKeyedService<AIAgent>("publisher")
+    );
+    ```
 
 ## 다중 에이전트 워크플로우 실행
 
@@ -388,37 +214,200 @@ save-points/
 
 1. 자동으로 웹 브라우저가 열리면서 DevUI 페이지가 나타나는지 확인합니다.
 
-   ![DevUI 페이지 - 다중 에이전트](./images/step-01-image-04.png)
+   ![DevUI 페이지 - 다중 에이전트](./images/step-03-image-03.png)
 
    Publisher 워크플로우를 선택합니다.
 
-   ![DevUI 페이지 - Publisher 워크플로우](./images/step-01-image-05.png)
+   ![DevUI 페이지 - Publisher 워크플로우](./images/step-03-image-04.png)
 
    메시지를 보내고 결과를 확인해 봅니다.
 
-   ![Publisher 워크플로우에 메시지 보내기](./images/step-01-image-06.png)
+   ![Publisher 워크플로우에 메시지 보내기](./images/step-03-image-05.png)
 
-   ![Publisher 워크플로우 실행 결과](./images/step-01-image-07.png)
+   ![Publisher 워크플로우 실행 결과](./images/step-03-image-06.png)
 
 1. `CTRL`+`C` 키를 눌러 애플리케이션 실행을 종료합니다.
+
+## 전체 애플리케이션 빌드 및 실행 #1
+
+1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
+
+    ```bash
+    cd $REPOSITORY_ROOT/workshop
+    ```
+
+1. 전체 프로젝트를 빌드합니다.
+
+    ```bash
+    dotnet restore && dotnet build
+    ```
+
+1. 백엔드 에이전트 애플리케이션을 실행합니다.
+
+    ```bash
+    dotnet run --project ./MafWorkshop.Agent
+    ```
+
+1. 다른 터미널을 열고 프론트엔드 UI 애플리케이션을 실행합니다.
+
+    ```bash
+    dotnet watch run --project ./MafWorkshop.WebUI
+    ```
+
+1. 자동으로 웹 브라우저가 열리면서 아래와 같은 챗 UI 페이지가 나타나는지 확인합니다.
+
+   ![웹 UI 페이지](./images/step-03-image-07.png)
+
+   아무 문장이나 입력한 후 결과를 확인합니다.
+
+   ![웹 UI 페이지 - 중복 응답 결과 확인](./images/step-03-image-08.png)
+
+   같은 이야기를 두 번 반복합니다. 하나는 **Writer** 에이전트가 응답한 것, 다른 하나는 **Editor** 에이전트가 수정한 것. 따라서 처음 **Writer** 에이전트가 응답한 것은 걸러내야 합니다.
+
+1. 두 터미널에서 각각 `CTRL`+`C` 키를 눌러 모든 애플리케이션 실행을 종료합니다.
+
+## UI 컴포넌트 수정
+
+1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
+
+    ```bash
+    cd $REPOSITORY_ROOT/workshop
+    ```
+
+1. `./MafWorkshop.WebUI/Components/Pages/Chat/Chat.razor` 파일을 열고 `// GetStreamingResponseAsync() 메서드 원본 삭제하기` 주석을 찾아 바로 아래에 있는 메서드를 삭제합니다. 이 메서드는 **Writer** 에이전트의 응답과 **Editor** 에이전트의 응답을 구분하지 못합니다.
+
+    **삭제전:**
+
+    ```csharp
+    // GetStreamingResponseAsync() 메서드 원본 삭제하기
+    private async Task GetStreamingResponseAsync(TextContent responseText, ChatMessage responseMessage, CancellationToken cancellationToken)
+    {
+        await foreach (var update in ChatClient.GetStreamingResponseAsync(messages.Skip(statefulMessageCount), chatOptions, cancellationToken))
+        {
+            await Task.Delay(50);
+
+            messages.AddMessages(update, filter: c => c is not TextContent);
+            responseText.Text += update.Text;
+            chatOptions.ConversationId = update.ConversationId;
+            ChatMessageItem.NotifyChanged(responseMessage);
+
+            StateHasChanged();
+        }
+    }
+    ```
+
+    **삭제후:** 주석만 남아있습니다.
+
+    ```csharp
+    // GetStreamingResponseAsync() 메서드 원본 삭제하기
+    ```
+
+1. 같은 파일에서 `// GetStreamingResponseAsync() 메서드 리팩토링하기` 주석을 찾아 아래와 같이 입력합니다. 이제 이 메서드는 Tool을 통해 **Editor** 에이전트가 정리한 응답만 출력합니다.
+
+    ```csharp
+    // GetStreamingResponseAsync() 메서드 리팩토링하기
+    private async Task GetStreamingResponseAsync(TextContent responseText, ChatMessage responseMessage, CancellationToken cancellationToken)
+    {
+        var deferAssistantTextUntilToolResponse = false;
+        var toolResponseSeen = false;
+        await foreach (var update in ChatClient.GetStreamingResponseAsync(messages.Skip(statefulMessageCount), chatOptions, cancellationToken))
+        {
+            await Task.Delay(50);
+
+            messages.AddMessages(update, filter: c => c is not TextContent);
+
+            if (deferAssistantTextUntilToolResponse == false && update.Role == ChatRole.Assistant && ContainsNonTextContent(update))
+            {
+                deferAssistantTextUntilToolResponse = true;
+            }
+
+            if (update.Role == ChatRole.Tool)
+            {
+                toolResponseSeen = true;
+            }
+
+            if ((deferAssistantTextUntilToolResponse == false || toolResponseSeen == true) && update.Role == ChatRole.Assistant)
+            {
+                responseText.Text += update.Text;
+                ChatMessageItem.NotifyChanged(responseMessage);
+            }
+
+            chatOptions.ConversationId = update.ConversationId;
+            StateHasChanged();
+        }
+
+        bool ContainsNonTextContent(ChatResponseUpdate update)
+        {
+            if (update.Contents.Any() == false)
+            {
+                return true;
+            }
+
+            if (update.Contents.Any(c => c is not TextContent) == true)
+            {
+                return true;
+            }
+
+            return false;
+        }
+    }
+    ```
+
+## 전체 애플리케이션 빌드 및 실행 #2
+
+1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
+
+    ```bash
+    cd $REPOSITORY_ROOT/workshop
+    ```
+
+1. 전체 프로젝트를 빌드합니다.
+
+    ```bash
+    dotnet restore && dotnet build
+    ```
+
+1. 백엔드 에이전트 애플리케이션을 실행합니다.
+
+    ```bash
+    dotnet run --project ./MafWorkshop.Agent
+    ```
+
+1. 다른 터미널을 열고 프론트엔드 UI 애플리케이션을 실행합니다.
+
+    ```bash
+    dotnet watch run --project ./MafWorkshop.WebUI
+    ```
+
+1. 자동으로 웹 브라우저가 열리면서 아래와 같은 챗 UI 페이지가 나타나는지 확인합니다.
+
+   ![웹 UI 페이지](./images/step-03-image-07.png)
+
+   아무 문장이나 입력한 후 결과를 확인합니다.
+
+   ![웹 UI 페이지 - 최종 응답 결과 확인](./images/step-03-image-09.png)
+
+   이제 **Editor** 에이전트가 수정한 응답만 출력합니다.
+
+1. 두 터미널에서 각각 `CTRL`+`C` 키를 눌러 모든 애플리케이션 실행을 종료합니다.
 
 ## 완성본 결과 확인
 
 이 세션의 완성본은 `$REPOSITORY_ROOT/save-points/step-01/complete`에서 확인할 수 있습니다.
 
-1. 앞서 실습한 `workshop` 디렉토리가 있다면 삭제하거나 다른 이름으로 바꿔주세요. 예) `workshop-step-01`
+1. 앞서 실습한 `workshop` 디렉토리가 있다면 삭제하거나 다른 이름으로 바꿔주세요. 예) `workshop-step-03`
 1. 터미널을 열고 아래 명령어를 차례로 실행시켜 실습 디렉토리를 만들고 시작 프로젝트를 복사합니다.
 
     ```bash
     # zsh/bash
     mkdir -p $REPOSITORY_ROOT/workshop && \
-        cp -a $REPOSITORY_ROOT/save-points/step-01/complete/. $REPOSITORY_ROOT/workshop/
+        cp -a $REPOSITORY_ROOT/save-points/step-03/complete/. $REPOSITORY_ROOT/workshop/
     ```
 
     ```powershell
     # PowerShell
     New-Item -Type Directory -Path $REPOSITORY_ROOT/workshop -Force && `
-        Copy-Item -Path $REPOSITORY_ROOT/save-points/step-01/complete/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
+        Copy-Item -Path $REPOSITORY_ROOT/save-points/step-03/complete/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
     ```
 
 1. 워크샵 디렉토리로 이동합니다.
@@ -427,31 +416,10 @@ save-points/
     cd $REPOSITORY_ROOT/workshop
     ```
 
-1. 이전 [LLM 접근 권한 설정](#llm-접근-권한-설정)을 따라 LLM 접근 권한을 설정합니다.
-1. 백엔드 에이전트 애플리케이션을 실행합니다.
-
-    ```bash
-    dotnet watch run --project ./MafWorkshop.Agent
-    ```
-
-1. 자동으로 웹 브라우저가 열리면서 DevUI 페이지가 나타나는지 확인합니다.
-
-   ![DevUI 페이지 - 다중 에이전트](./images/step-01-image-04.png)
-
-   Publisher 워크플로우를 선택합니다.
-
-   ![DevUI 페이지 - Publisher 워크플로우](./images/step-01-image-05.png)
-
-   메시지를 보내고 결과를 확인해 봅니다.
-
-   ![Publisher 워크플로우에 메시지 보내기](./images/step-01-image-06.png)
-
-   ![Publisher 워크플로우 실행 결과](./images/step-01-image-07.png)
-
-1. `CTRL`+`C` 키를 눌러 애플리케이션 실행을 종료합니다.
+1. [전체 애플리케이션 빌드 및 실행 #2](#전체-애플리케이션-빌드-및-실행-2) 섹션을 따라합니다.
 
 ---
 
 축하합니다! Microsoft Agent Framework을 활용한 에이전트 백엔드 개발이 끝났습니다. 이제 다음 단계로 이동하세요!
 
-👈 [00: 개발 환경 설정](./00-setup.md) | [02: Microsoft Agent Framework에 웹 UI 연동하기](./02-web-ui-integration-with-maf.md) 👉
+👈 [02: Microsoft Agent Framework에 프론트엔드 UI 연동하기](./02-ui-integration-with-maf.md) | [04: Aspire로 프론트엔드 웹 UI와 백엔드 에이전트 오케스트레이션하기](./04-aspire-orchestration.md) 👉

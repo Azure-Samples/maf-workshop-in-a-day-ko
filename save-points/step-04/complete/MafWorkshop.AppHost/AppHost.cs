@@ -9,9 +9,9 @@ var agent = builder.AddProject<Projects.MafWorkshop_Agent>("agent")
 
 // 프론트엔드 웹 UI 프로젝트 추가하기
 var webUI = builder.AddProject<Projects.MafWorkshop_WebUI>("webui")
-                    .WithExternalHttpEndpoints()
-                    .WithReference(agent)
-                    .WaitFor(agent);
+                   .WithExternalHttpEndpoints()
+                   .WithReference(agent)
+                   .WaitFor(agent);
 
 await builder.Build().RunAsync();
 
@@ -23,12 +23,35 @@ public static class LlmResourceFactory
         var provider = config["LlmProvider"] ?? throw new InvalidOperationException("Missing configuration: LlmProvider");
         source = provider switch
         {
-            "AzureOpenAI" => AddAzureOpenAIResource(source, config),
             "GitHubModels" => AddGitHubModelsResource(source, config),
+            "AzureOpenAI" => AddAzureOpenAIResource(source, config),
             _ => throw new NotSupportedException($"The specified LLM provider '{provider}' is not supported.")
         };
 
         return source;
+    }
+
+    private static IResourceBuilder<ProjectResource> AddGitHubModelsResource(IResourceBuilder<ProjectResource> source, IConfiguration config)
+    {
+        var provider = config["LlmProvider"];
+
+        var github = config.GetSection("GitHub");
+        var endpoint = github["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Endpoint");
+        var token = github["Token"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Token");
+        var model = github["Model"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Model");
+
+        Console.WriteLine();
+        Console.WriteLine($"\tUsing {provider}: {model}");
+        Console.WriteLine();
+
+        var apiKey = source.ApplicationBuilder
+                           .AddParameter(name: "apiKey", value: token, secret: true);
+        var chat = source.ApplicationBuilder
+                         .AddGitHubModel(name: "chat", model: model)
+                         .WithApiKey(apiKey);
+
+        return source.WithReference(chat)
+                     .WaitFor(chat);
     }
 
     private static IResourceBuilder<ProjectResource> AddAzureOpenAIResource(IResourceBuilder<ProjectResource> source, IConfiguration config)
@@ -51,29 +74,6 @@ public static class LlmResourceFactory
                          .WithEndpoint($"{endpoint.TrimEnd('/')}/openai/v1/")
                          .WithApiKey(apiKey)
                          .AddModel(name: "chat", model: deploymentName);
-
-        return source.WithReference(chat)
-                     .WaitFor(chat);
-    }
-
-    private static IResourceBuilder<ProjectResource> AddGitHubModelsResource(IResourceBuilder<ProjectResource> source, IConfiguration config)
-    {
-        var provider = config["LlmProvider"];
-
-        var github = config.GetSection("GitHub");
-        var endpoint = github["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Endpoint");
-        var token = github["Token"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Token");
-        var model = github["Model"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Model");
-
-        Console.WriteLine();
-        Console.WriteLine($"\tUsing {provider}: {model}");
-        Console.WriteLine();
-
-        var apiKey = source.ApplicationBuilder
-                           .AddParameter(name: "apiKey", value: token, secret: true);
-        var chat = source.ApplicationBuilder
-                         .AddGitHubModel(name: "chat", model: model)
-                         .WithApiKey(apiKey);
 
         return source.WithReference(chat)
                      .WaitFor(chat);

@@ -1,8 +1,5 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-// Azure Container Apps 환경 구성 추가하기
-builder.AddAzureContainerAppEnvironment("env");
-
 // MCP Todo 서버 프로젝트 추가하기
 var mcptodo = builder.AddProject<Projects.MafWorkshop_McpTodo>("mcptodo")
                      .WithExternalHttpEndpoints();
@@ -18,8 +15,8 @@ var agent = builder.AddProject<Projects.MafWorkshop_Agent>("agent")
 //                    .WithLlmReference(builder.Configuration);
 
 var webUI = builder.AddProject<Projects.MafWorkshop_WebUI>("webui")
-                    .WithExternalHttpEndpoints()
-                    .WithReference(agent)
-                    .WaitFor(agent);
+                   .WithExternalHttpEndpoints()
+                   .WithReference(agent)
+                   .WaitFor(agent);
 
 await builder.Build().RunAsync();
