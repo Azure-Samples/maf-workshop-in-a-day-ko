@@ -32,7 +32,7 @@
 
 ```text
 save-points/
-└── step-03/
+└── step-04/
     └── start/
         ├── MafWorkshop.sln
         ├── MafWorkshop.Agent/

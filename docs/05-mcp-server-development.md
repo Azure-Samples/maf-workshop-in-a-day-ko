@@ -34,7 +34,7 @@
 
 ```text
 save-points/
-└── step-03/
+└── step-05/
     └── start/
         ├── .vscode/
         │   ├── mcp.http.local.json
