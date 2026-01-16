@@ -1,4 +1,4 @@
-# 07: Copilot Studio에서 에이전트 개발하고 MCP 서버 연동하기
+# 07: Copilot Studio에서 에이전트 개발하고 MCP 서버 연동하기 (선택)
 
 이 세션에서는 앞서 만들었던 [MCP 서버](./05-mcp-server-development.md)를 [Copilot Studio](https://learn.microsoft.com/microsoft-copilot-studio/fundamentals-what-is-copilot-studio)의 에이전트에 연동합니다.
 
@@ -81,6 +81,24 @@ save-points/
     dotnet restore && dotnet build
     ```
 
+## Copilot Studio 접속 및 에이전트 생성
+
+> 워크샵 진행자로부터 받은 Copilot Studio 접속 정보를 이용합니다.
+>
+> **중요**: Copilot Studio의 UI는 시간에 따라 변화하므로 스크린샷과 다를 수도 있습니다.
+
+1. [Copilot Studio](https://copilotstudio.microsoft.com)에 로그인합니다.
+
+   ![Copilot Studio - 첫화면](./images/step-07-image-06.png)
+
+1. Agent 탭으로 이동해 [➕ Create blank agent] 버튼을 클릭합니다.
+
+   ![Copilot Studio - Agent 탭](./images/step-07-image-07.png)
+
+   에이전트가 하나 만들어졌습니다.
+
+   ![Copilot Studio - Agent 생성 결과](./images/step-07-image-08.png)
+
 ## 로컬 MCP 서버 실행
 
 1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
@@ -115,6 +133,75 @@ save-points/
 
    [Forwarded Address] 컬럼의 접속 URL값을 복사해 둡니다. URL 형식은 대략 `https://{랜덤문자}-{포트번호}.{지역}.devtunnels.ms/`와 비슷합니다. 예를 들어 여기서는 `https://46013rm0-5497.kc.devtunnels.ms/` 라고 하겠습니다.
 
+## Copilot Studio 에이전트에 로컬 MCP 서버 연결 및 실행
+
+1. 앞서 만든 에이전트의 상단 [Tools] 탭으로 이동한 후 [➕ Add a tool] 버튼을 클릭합니다.
+
+   ![Copilot Studio - 새 Tool 생성](./images/step-07-image-09.png)
+
+   이어 [➕ New tool] 버튼을 클릭합니다.
+
+   ![Copilot Studio - 새 Tool 버튼](./images/step-07-image-10.png)
+
+1. [Model Context Protocol] 버튼을 클릭합니다.
+
+   ![Copilot Studio - 새 MCP 서버 버튼](./images/step-07-image-11.png)
+
+1. 아래 그림과 같이 MCP 서버 접속 정보를 입력합니다. 이후 [Create] 버튼을 클릭합니다.
+
+   ![Copilot Studio - Agent - MCP 서버 정보 입력](./images/step-07-image-12.png)
+
+   - `Server name`: `Todo Manager Local XXX` 👈 입력. XXX는 랜덤 숫자 또는 문자
+   - `Server description`: `To-do 리스트 아이템의 생성/수정/삭제 등을 담당하는 MCP 서버입니다.` 👈 입력
+   - `Server URL`: 앞서 복사해 둔 로컬 MCP 서버용 공개 주소 + `/mcp` 입력 (예: `https://46013rm0-5497.kc.devtunnels.ms/mcp`)
+   - `Authentication`: `None` 👈 선택
+
+1. 아래 화면이 나타나면 [Not connected] 버튼을 클릭한 후 [Create new connection] 버튼을 클릭합니다.
+
+   ![Copilot Studio - Agent - MCP 서버 커넥션 생성 요청](./images/step-07-image-13.png)
+
+   이후 [Create] 버튼을 눌러 로컬 MCP 서버와 연결합니다.
+
+   ![Copilot Studio - Agent - MCP 서버 커넥션 생성](./images/step-07-image-14.png)
+
+   이후 [Add and configure] 버튼을 클릭해서 로컬 MCP 서버를 에이전트에 추가합니다.
+
+1. Copilot Studio에서 [Tools] 탭으로 이동한 후 [➕ New tool] 버튼을 클릭합니다.
+
+   ![Copilot Studio - 새 Tool 생성](./images/step-07-image-15.png)
+
+   MCP 서버에 정의해 둔 Tool이 보입니다.
+
+   ![Copilot Studio - MCP 서버 Tool 리스트](./images/step-07-image-16.png)
+
+1. [Settings] 버튼을 클릭합니다.
+
+   ![Copilot Studio - 에이전트 Settings](./images/step-07-image-17.png)
+
+   현재 에이전트에 연결한 MCP 서버가 보입니다. [Connect] 링크를 클릭합니다.
+
+   ![Copilot Studio - 에이전트 Settings - MCP 서버 커넥션](./images/step-07-image-18.png)
+
+   [Submit] 버튼을 클릭합니다.
+
+   ![Copilot Studio - 에이전트 Settings - MCP 서버 커넥션 연결](./images/step-07-image-19.png)
+
+   커넥션 연결을 완료했습니다. 오른쪽 위의 [X] 버튼을 클릭해서 에이전트 Settings 화면을 빠져나갑니다.
+
+   ![Copilot Studio - 에이전트 Settings - MCP 서버 커넥션 연결 완료](./images/step-07-image-20.png)
+
+1. 아래와 같이 오른쪽 테스트 세션에서 다양하게 프롬프트를 실행시켜 보고 그 결과를 확인합니다.
+
+   ![Copilot Studio - 에이전트 실행 결과 #1](./images/step-07-image-21.png)
+
+   ![Copilot Studio - 에이전트 실행 결과 #2](./images/step-07-image-22.png)
+
+   ![Copilot Studio - 에이전트 실행 결과 #3](./images/step-07-image-23.png)
+
+## 로컬 MCP 서버 종료
+
+1. 터미널에서 `CTRL`+`C` 키를 눌러 애플리케이션 실행을 종료합니다.
+
 ## 리모트 MCP 서버 배포
 
 > **NOTE**: Azure 구독을 제공 받았을 경우 진행하세요. 워크샵에 따라 Azure 구독을 제공하지 않을 수도 있습니다.
@@ -144,25 +231,9 @@ save-points/
     azd env get-value AZURE_RESOURCE_MAFWORKSHOP_MCPTODO_FQDN
     ```
 
-## Copilot Studio 접속 및 에이전트 생성
+## Copilot Studio에 리모트 MCP 서버 연결 및 실행
 
-> 워크샵 진행자로부터 받은 Copilot Studio 접속 정보를 이용합니다.
->
-> **중요**: Copilot Studio의 UI는 시간에 따라 변화하므로 스크린샷과 다를 수도 있습니다.
-
-1. [Copilot Studio](https://copilotstudio.microsoft.com)에 로그인합니다.
-
-   ![Copilot Studio - 첫화면](./images/step-07-image-06.png)
-
-1. Agent 탭으로 이동해 [➕ Create blank agent] 버튼을 클릭합니다.
-
-   ![Copilot Studio - Agent 탭](./images/step-07-image-07.png)
-
-   에이전트가 하나 만들어졌습니다.
-
-   ![Copilot Studio - Agent 생성 결과](./images/step-07-image-08.png)
-
-## Copilot Studio에 로컬 MCP 서버 커넥터 추가
+> **NOTE**: Azure 구독을 제공 받았을 경우 진행하세요. 워크샵에 따라 Azure 구독을 제공하지 않을 수도 있습니다.
 
 1. 앞서 만든 에이전트의 상단 [Tools] 탭으로 이동한 후 [➕ Add a tool] 버튼을 클릭합니다.
 
@@ -178,103 +249,65 @@ save-points/
 
 1. 아래 그림과 같이 MCP 서버 접속 정보를 입력합니다. 이후 [Create] 버튼을 클릭합니다.
 
-   ![Copilot Studio - Agent - MCP 서버 정보 입력](./images/step-07-image-12.png)
+   ![Copilot Studio - Agent - MCP 서버 정보 입력](./images/step-07-image-24.png)
 
-   - `Server name`: `Todo Manager Local XXX` 👈 입력. XXX는 랜덤 숫자 또는 문자
+   - `Server name`: `Todo Manager Remote XXX` 👈 입력. XXX는 랜덤 숫자 또는 문자
    - `Server description`: `To-do 리스트 아이템의 생성/수정/삭제 등을 담당하는 MCP 서버입니다.` 👈 입력
-   - `Server URL`: 앞서 복사해 둔 로컬 MCP 서버용 공개 주소 입력 (예: `https://46013rm0-5497.kc.devtunnels.ms/`)
+   - `Server URL`: 앞서 복사해 둔 리모트 MCP 서버용 공개 주소 + `/mcp` 입력 (예: `mafworkshop-mcptodo.{랜덤문자열}-{랜덤숫자}.{지역}.azurecontainerapps.io/mcp`)
    - `Authentication`: `None` 👈 선택
 
 1. 아래 화면이 나타나면 [Not connected] 버튼을 클릭한 후 [Create new connection] 버튼을 클릭합니다.
 
-   ![Copilot Studio - Agent - MCP 서버 커넥션 생성 요청](./images/step-07-image-13.png)
+   ![Copilot Studio - Agent - MCP 서버 커넥션 생성 요청](./images/step-07-image-25.png)
 
    이후 [Create] 버튼을 눌러 로컬 MCP 서버와 연결합니다.
 
-   ![Copilot Studio - Agent - MCP 서버 커넥션 생성](./images/step-07-image-14.png)
+   ![Copilot Studio - Agent - MCP 서버 커넥션 생성](./images/step-07-image-26.png)
 
    이후 [Add and configure] 버튼을 클릭해서 로컬 MCP 서버를 에이전트에 추가합니다.
 
 1. Copilot Studio에서 [Tools] 탭으로 이동한 후 [➕ New tool] 버튼을 클릭합니다.
 
-   ![Copilot Studio - 새 Tool 생성](./images/step-07-image-09.png)
+   ![Copilot Studio - 새 Tool 생성](./images/step-07-image-27.png)
 
-## Copilot Studio에 리모트 MCP 서버 커넥터 추가
+   MCP 서버에 정의해 둔 Tool이 보입니다.
 
-1. 앞서 만든 에이전트의 상단 [Tools] 탭으로 이동한 후 [➕ Add a tool] 버튼을 클릭합니다.
+   ![Copilot Studio - MCP 서버 Tool 리스트](./images/step-07-image-28.png)
 
-   ![Copilot Studio - 새 Tool 생성](./images/step-07-image-09.png)
+1. [Settings] 버튼을 클릭합니다.
 
-   이어 [➕ New tool] 버튼을 클릭합니다.
+   ![Copilot Studio - 에이전트 Settings](./images/step-07-image-29.png)
 
-   ![Copilot Studio - 새 Tool 버튼](./images/step-07-image-10.png)
+   현재 에이전트에 연결한 MCP 서버가 보입니다. [Connect] 링크를 클릭합니다.
 
-1. [Model Context Protocol] 버튼을 클릭합니다.
+   ![Copilot Studio - 에이전트 Settings - MCP 서버 커넥션](./images/step-07-image-30.png)
 
-   ![Copilot Studio - 새 MCP 서버 버튼](./images/step-07-image-11.png)
+   [Submit] 버튼을 클릭합니다.
 
-1. 아래 그림과 같이 MCP 서버 접속 정보를 입력합니다. 이후 [Create] 버튼을 클릭합니다.
+   ![Copilot Studio - 에이전트 Settings - MCP 서버 커넥션 연결](./images/step-07-image-31.png)
 
-   ![Copilot Studio - Agent - MCP 서버 정보 입력](./images/step-07-image-12.png)
+   커넥션 연결을 완료했습니다. 오른쪽 위의 [X] 버튼을 클릭해서 에이전트 Settings 화면을 빠져나갑니다.
 
-   - `Server name`: `Todo Manager Local XXX` 👈 입력. XXX는 랜덤 숫자 또는 문자
-   - `Server description`: `To-do 리스트 아이템의 생성/수정/삭제 등을 담당하는 MCP 서버입니다.` 👈 입력
-   - `Server URL`: 앞서 복사해 둔 로컬 MCP 서버용 공개 주소 입력 (예: `https://46013rm0-5497.kc.devtunnels.ms/`)
-   - `Authentication`: `None` 👈 선택
+   ![Copilot Studio - 에이전트 Settings - MCP 서버 커넥션 연결 완료](./images/step-07-image-32.png)
 
-1. 아래 화면이 나타나면 [Not connected] 버튼을 클릭한 후 [Create new connection] 버튼을 클릭합니다.
+1. 아래와 같이 오른쪽 테스트 세션에서 다양하게 프롬프트를 실행시켜 보고 그 결과를 확인합니다.
 
-   ![Copilot Studio - Agent - MCP 서버 커넥션 생성 요청](./images/step-07-image-13.png)
+   ![Copilot Studio - 에이전트 실행 결과 #1](./images/step-07-image-33.png)
 
-   이후 [Create] 버튼을 눌러 로컬 MCP 서버와 연결합니다.
+   ![Copilot Studio - 에이전트 실행 결과 #2](./images/step-07-image-34.png)
 
-   ![Copilot Studio - Agent - MCP 서버 커넥션 생성](./images/step-07-image-14.png)
+   ![Copilot Studio - 에이전트 실행 결과 #3](./images/step-07-image-35.png)
 
-   이후 [Add and configure] 버튼을 클릭해서 로컬 MCP 서버를 에이전트에 추가합니다.
+## 리모트 MCP 서버 리소스 삭제
 
-1. Copilot Studio에서 [Tools] 탭으로 이동한 후 [➕ New tool] 버튼을 클릭합니다.
+1. 아래 명령어를 실행시켜 배포한 MCP 서버 애플리케이션을 삭제합니다.
 
-   ![Copilot Studio - 새 Tool 생성](./images/step-07-image-09.png)
-
-
-
-
-## Copilot Studio에서 에이전트에 로컬 MCP 서버 연결
-
-1. Agent가 만들어지면 스크롤을 내려 [Add tool] 버튼을 클릭합니다.
-
-
-1. Model Context Protocol 버튼을 클릭합니다.
-
-   ![Copilot Studio - Agent - MCP 서버 추가](./images/step-07-image-09.png)
-
-1. 아래 그림과 같이 MCP 서버 접속 정보를 입력합니다. 이후 [Create] 버튼을 클릭합니다.
-
-   ![Copilot Studio - Agent - MCP 서버 정보 입력](./images/step-07-image-10.png)
-
-   - `Server name`: Todo Manager Local
-   - `Server description`: To-do 리스트 아이템의 생성/수정/삭제 등을 담당하는 MCP 서버입니다.
-   - `Server URL`: 앞서 복사해 둔 로컬 MCP 서버용 공개 주소 + `/mcp` (예: `https://46013rm0-5497.kc.devtunnels.ms/mcp`)
-
-## Copilot Studio에서 리모트 MCP 서버 연결
-
-1. Agent 탭으로 이동해 [➕ Create blank agent] 버튼을 클릭합니다.
-
-   ![Copilot Studio - Agent 탭](./images/step-07-image-07.png)
-
-1. Agent가 만들어지면 스크롤을 내려 [Add tool] 버튼을 클릭합니다.
-
-   ![Copilot Studio - Agent - Add tool](./images/step-07-image-08.png)
-
-1. Model Context Protocol 버튼을 클릭합니다.
-
-   ![Copilot Studio - Agent - MCP 서버 추가](./images/step-07-image-09.png)
-
-1. 아래 그림과 같이 MCP 서버 접속 정보를 입력합니다. 이후 [Create] 버튼을 클릭합니다.
-
+    ```bash
+    azd down --purge --force
+    ```
 
 ---
 
-축하합니다! Copilot Studio에 MCP 서버를 직접 연동해 봤습니다.
+축하합니다! Copilot Studio에서 에이전트를 개발하고 MCP 서버를 직접 연동해 봤습니다.
 
 👈 [06: Microsoft Agent Framework에 MCP 서버 연동하기](./06-mcp-server-integration-with-maf.md) | [README](../README.md) 👉
