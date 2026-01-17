@@ -123,15 +123,11 @@ save-points/
 
    ![로컬 MCP 서버 실행 - 포트 포워딩 - 공개 포트 설정](./images/step-07-image-03.png)
 
-   이 때 공개 포트를 사용하면 누구나 내 컴퓨터에 접속할 수 있으니 조심하라는 경고 메시지가 나타납니다. [Continue] 버튼을 눌러 계속 진행합니다.
-
-   ![로컬 MCP 서버 실행 - 포트 포워딩 - 공개 포트 설정 - 경고](./images/step-07-image-04.png)
-
    MCP 서버 포트가 인터넷으로 누구나 접속할 수 있도록 바뀌었습니다.
 
    ![로컬 MCP 서버 실행 - 포트 포워딩 - 포트 공개](./images/step-07-image-05.png)
 
-   [Forwarded Address] 컬럼의 접속 URL값을 복사해 둡니다. URL 형식은 대략 `https://{랜덤문자}-{포트번호}.{지역}.devtunnels.ms/`와 비슷합니다. 예를 들어 여기서는 `https://46013rm0-5497.kc.devtunnels.ms/` 라고 하겠습니다.
+   [Forwarded Address] 컬럼의 접속 URL값을 복사해 둡니다. URL 형식은 대략 `https://{인스턴스이름}-{랜덤문자}-{포트번호}.app.github.dev/`와 비슷합니다. 예를 들어 여기서는 `https://laughing-trout-jj69pprrgwcj6px-5497.app.github.dev/` 라고 하겠습니다.
 
 ## Copilot Studio 에이전트에 로컬 MCP 서버 연결 및 실행
 
@@ -153,7 +149,7 @@ save-points/
 
    - `Server name`: `Todo Manager Local XXX` 👈 입력. XXX는 랜덤 숫자 또는 문자
    - `Server description`: `To-do 리스트 아이템의 생성/수정/삭제 등을 담당하는 MCP 서버입니다.` 👈 입력
-   - `Server URL`: 앞서 복사해 둔 로컬 MCP 서버용 공개 주소 + `/mcp` 입력 (예: `https://46013rm0-5497.kc.devtunnels.ms/mcp`)
+   - `Server URL`: 앞서 복사해 둔 로컬 MCP 서버용 공개 주소 + `/mcp` 입력 (예: `https://laughing-trout-jj69pprrgwcj6px-5497.app.github.dev/mcp`)
    - `Authentication`: `None` 👈 선택
 
 1. 아래 화면이 나타나면 [Not connected] 버튼을 클릭한 후 [Create new connection] 버튼을 클릭합니다.
