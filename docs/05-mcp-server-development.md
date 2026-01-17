@@ -343,6 +343,11 @@ save-points/
 
    ![GitHub Copilot - MCP 서버 종료](./images/step-05-image-05.png)
 
+1. 아래 명령어를 실행시켜 방금 배포한 애플리케이션을 모두 삭제합니다.
+
+    ```bash
+    azd down --purge --force
+
 ## 완성본 결과 확인
 
 이 세션의 완성본은 `$REPOSITORY_ROOT/save-points/step-05/complete`에서 확인할 수 있습니다.

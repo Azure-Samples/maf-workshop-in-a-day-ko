@@ -351,6 +351,11 @@ save-points/
 
    ![애플리케이션 실행 결과](./images/step-06-image-06.png)
 
+1. 아래 명령어를 실행시켜 방금 배포한 애플리케이션을 모두 삭제합니다.
+
+    ```bash
+    azd down --purge --force
+
 ## 완성본 결과 확인
 
 이 세션의 완성본은 `$REPOSITORY_ROOT/save-points/step-06/complete`에서 확인할 수 있습니다.
