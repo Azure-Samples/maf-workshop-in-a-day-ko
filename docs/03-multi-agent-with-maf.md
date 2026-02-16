@@ -255,9 +255,10 @@ save-points/
     dotnet run --project ./MafWorkshop.Agent
     ```
 
-1. 다른 터미널을 열고 프론트엔드 UI 애플리케이션을 실행합니다.
+1. 다른 터미널을 열고 프론트엔드 UI 애플리케이션을 실행합니다. 새 터미널에서는 `$REPOSITORY_ROOT` 값을 인식하지 못하므로 [리포지토리 루트 설정](#리포지토리-루트-설정) 섹션을 다시 다시 실행시켜야 합니다.
 
     ```bash
+    cd $REPOSITORY_ROOT/workshop
     dotnet watch run --project ./MafWorkshop.WebUI
     ```
 
@@ -380,9 +381,10 @@ save-points/
     dotnet run --project ./MafWorkshop.Agent
     ```
 
-1. 다른 터미널을 열고 프론트엔드 UI 애플리케이션을 실행합니다.
+1. 다른 터미널을 열고 프론트엔드 UI 애플리케이션을 실행합니다. 새 터미널에서는 `$REPOSITORY_ROOT` 값을 인식하지 못하므로 [리포지토리 루트 설정](#리포지토리-루트-설정) 섹션을 다시 다시 실행시켜야 합니다.
 
     ```bash
+    cd $REPOSITORY_ROOT/workshop
     dotnet watch run --project ./MafWorkshop.WebUI
     ```
 
