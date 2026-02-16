@@ -311,13 +311,13 @@ save-points/
     ```bash
     # zsh/bash
     mkdir -p $REPOSITORY_ROOT/.vscode
-    cp ./.vscode/mcp.http.local.json $REPOSITORY_ROOT/.vscode/mcp.json 
+    cp ./.vscode/mcp.http.remote.json $REPOSITORY_ROOT/.vscode/mcp.json 
     ```
 
     ```powershell
     # PowerShell
     New-Item -Type Directory -Path $REPOSITORY_ROOT/.vscode -Force
-    Copy-Item -Path ./.vscode/mcp.http.local.json -Destination $REPOSITORY_ROOT/.vscode/mcp.json -Force
+    Copy-Item -Path ./.vscode/mcp.http.remote.json -Destination $REPOSITORY_ROOT/.vscode/mcp.json -Force
     ```
 
 1. 오른쪽 익스텐션 아이콘을 클릭한 후 MCP 서버 섹션을 보면 `todo-list` MCP 서버가 보입니다. 톱니바퀴 모양을 클릭한 후 `Start Server` 메뉴를 클릭해서 MCP 서버를 실행시킵니다.
@@ -364,13 +364,13 @@ save-points/
     ```bash
     # zsh/bash
     mkdir -p $REPOSITORY_ROOT/workshop && \
-        cp -a $REPOSITORY_ROOT/save-points/step-04/complete/. $REPOSITORY_ROOT/workshop/
+        cp -a $REPOSITORY_ROOT/save-points/step-05/complete/. $REPOSITORY_ROOT/workshop/
     ```
 
     ```powershell
     # PowerShell
     New-Item -Type Directory -Path $REPOSITORY_ROOT/workshop -Force && `
-        Copy-Item -Path $REPOSITORY_ROOT/save-points/step-04/complete/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
+        Copy-Item -Path $REPOSITORY_ROOT/save-points/step-05/complete/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
     ```
 
 1. 워크샵 디렉토리로 이동합니다.

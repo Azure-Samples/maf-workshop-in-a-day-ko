@@ -303,6 +303,32 @@ save-points/
 
 1. 터미널에서 `CTRL`+`C`를 눌러 애플리케이션을 종료합니다.
 
+1. 다시 애플리케이션을 실행합니다.
+
+    ```bash
+    dotnet watch run --project ./MafWorkshop.Agent
+    ```
+
+1. 자동으로 웹 브라우저가 열리면서 DevUI 페이지가 나타나는지 확인합니다.
+
+   ![DevUI 페이지 - 단일 에이전트](./images/step-01-image-02.png)
+
+   메시지를 보내고 결과를 확인해 봅니다.
+
+   ![Writer 에이전트 실행 결과](./images/step-01-image-03.png)
+
+   > **NOTE**: 만약 gpt-5-mini 모델을 실행시킬 수 없을 때 에러가 생길 수 있습니다. 그럴 때는 `/MafWorkshop.Agent/appsettings.json` 파일을 열어 `GitHub` 섹션의 모델명을 `openai/gpt-5-mini`에서 `openai/gpt-4o-mini`로 바꿔보세요.
+   >
+   > ```jsonc
+   > {
+   >   "GitHub": {
+   >     "Endpoint": "https://models.github.ai/inference",
+   >     "Token": "{{GITHUB_PAT}}",
+   >     "Model": "openai/gpt-4o-mini"
+   >   }
+   > }
+   > ```
+
 1. **Azure 구독이 있을 경우** `./MafWorkshop.Agent/appsettings.json` 파일을 열어 아래와 같이 `LlmProvider` 값을 `AzureOpenAI`로 바꿔봅니다.
 
     ```jsonc
