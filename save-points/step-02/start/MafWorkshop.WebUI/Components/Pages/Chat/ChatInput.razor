@@ -2,7 +2,14 @@
 
 <EditForm Model="@this" OnValidSubmit="@SendMessageAsync">
     <label class="input-box page-width">
-        <textarea @ref="@textArea" @bind="@messageText" placeholder="Type your message..." rows="1"></textarea>
+          <textarea @ref="@textArea"
+              @bind-value="@messageText"
+              @bind-value:event="oninput"
+              @onkeydown="@HandleKeyDown"
+              @oncompositionstart="@HandleCompositionStart"
+              @oncompositionend="@HandleCompositionEnd"
+              placeholder="Type your message..."
+              rows="1"></textarea>
 
         <div class="tools">
             <button type="submit" title="Send" class="send-button">
@@ -17,6 +24,8 @@
 @code {
     private ElementReference textArea;
     private string? messageText;
+    private bool isComposing;
+    private bool isSending;
 
     [Parameter]
     public EventCallback<ChatMessage> OnSend { get; set; }
@@ -26,12 +35,37 @@
 
     private async Task SendMessageAsync()
     {
-        if (messageText is { Length: > 0 } text)
+        if (isSending || messageText is not { Length: > 0 } text)
+        {
+            return;
+        }
+
+        isSending = true;
+
+        try
         {
             messageText = null;
             await OnSend.InvokeAsync(new ChatMessage(ChatRole.User, text));
         }
+        finally
+        {
+            isSending = false;
+        }
     }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && e.ShiftKey == false && isComposing == false && e.IsComposing == false)
+        {
+            await SendMessageAsync();
+        }
+    }
+
+    private void HandleCompositionStart()
+        => isComposing = true;
+
+    private void HandleCompositionEnd()
+        => isComposing = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
