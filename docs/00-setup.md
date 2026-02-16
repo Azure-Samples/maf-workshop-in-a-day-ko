@@ -86,8 +86,8 @@
    이번에는 아래와 같이 보여야 합니다.
 
     ```text
-    origin  https://github.com/<YOUR_GITHUB_ID>/maf-workshop-in-a-day-ko.git (fetch)
-    origin  https://github.com/<YOUR_GITHUB_ID>/maf-workshop-in-a-day-ko.git (push)
+    origin  https://github.com/{{YOUR_GITHUB_ID}}/maf-workshop-in-a-day-ko.git (fetch)
+    origin  https://github.com/{{YOUR_GITHUB_ID}}/maf-workshop-in-a-day-ko.git (push)
     upstream        https://github.com/Azure-Samples/maf-workshop-in-a-day-ko (fetch)
     upstream        https://github.com/Azure-Samples/maf-workshop-in-a-day-ko (push)
     ```
@@ -112,7 +112,7 @@
 
 > **NOTE**: 만약 Azure 구독을 사용할 수 없을 경우 [GitHub Models](https://docs.github.com/github-models)에서 제공하는 [gpt-5-mini](https://github.com/marketplace/models/azure-openai/gpt-5-mini) 모델을 무료로 사용할 수 있습니다.
 
-1. [퍼스널 액세스 토큰(PAT)](https://docs.github.com/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)을 생성합니다. 이 때, `models:read` 권한을 주지 않으면 GitHub Models에 접근할 수 없습니다.
+1. [퍼스널 액세스 토큰(PAT)](https://docs.github.com/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token)을 생성합니다. 이 때, "Models" 👉 "Read-Only" 권한을 주지 않으면 GitHub Models에 접근할 수 없습니다.
 
 1. PAT 생성 후 잘 보관해 둡니다. 한 번 생성한 토큰은 나중에 다시 확인할 수 없으므로 분실할 경우 새로 생성해야 합니다.
 
@@ -191,12 +191,18 @@
     # zsh/bash
     endpoint=$(azd env get-value 'AZURE_OPENAI_ENDPOINT')
     apiKey=$(az cognitiveservices account keys list --name $(azd env get-value 'AZURE_OPENAI_NAME') --resource-group rg-$(azd env get-value 'AZURE_ENV_NAME') --query "key1" -o tsv)
+
+    echo "Endpoint: $endpoint"
+    echo "API Key: $apiKey"
     ```
 
     ```powershell
     # PowerShell
     $endpoint = azd env get-value 'AZURE_OPENAI_ENDPOINT'
     $apiKey = az cognitiveservices account keys list --name $(azd env get-value 'AZURE_OPENAI_NAME') --resource-group rg-$(azd env get-value 'AZURE_ENV_NAME') --query "key1" -o tsv
+
+    echo "Endpoint: $endpoint"
+    echo "API Key: $apiKey"
     ```
 
 ---

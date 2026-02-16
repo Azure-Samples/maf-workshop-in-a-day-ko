@@ -72,4 +72,6 @@ else
     app.MapDevUI();
 }
 
+app.MapGet("/", () => Results.Redirect("/devui"));
+
 await app.RunAsync();

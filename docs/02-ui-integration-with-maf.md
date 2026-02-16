@@ -213,9 +213,10 @@ save-points/
     dotnet run --project ./MafWorkshop.Agent
     ```
 
-1. 다른 터미널을 열고 프론트엔드 UI 애플리케이션을 실행합니다.
+1. 다른 터미널을 열고 프론트엔드 UI 애플리케이션을 실행합니다. 새 터미널에서는 `$REPOSITORY_ROOT` 값을 인식하지 못하므로 [리포지토리 루트 설정](#리포지토리-루트-설정) 섹션을 다시 다시 실행시켜야 합니다.
 
     ```bash
+    cd $REPOSITORY_ROOT/workshop
     dotnet watch run --project ./MafWorkshop.WebUI
     ```
 
@@ -226,6 +227,8 @@ save-points/
    아무 문장이나 입력한 후 결과를 확인합니다.
 
    ![웹 UI 페이지 - 결과 확인](./images/step-02-image-03.png)
+
+   > **NOTE**: 이 시점부터 GitHub Models를 사용하다 보면 사용량 초과(rate limit) 에러가 나타날 수 있습니다. 그러면 `/MafWorkshop.Agent/appsettings.json`의 `LlmProvider` 값을 `GitHubModels`에서 `AzureOpenAI`로 바꿔 진행합니다.
 
 1. 두 터미널에서 각각 `CTRL`+`C` 키를 눌러 모든 애플리케이션 실행을 종료합니다.
 
