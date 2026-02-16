@@ -29,6 +29,8 @@ if (builder.Environment.IsDevelopment() == false)
 }
 // DevUI 미들웨어 설정하기
 
+// /devui 엔드포인트 자동 포워딩 설정하기
+
 await app.RunAsync();
 
 // ChatClientFactory 클래스 추가하기

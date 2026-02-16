@@ -399,6 +399,12 @@ save-points/
 
    ![Aspire 대시보드 페이지 - GitHub Models](./images/step-04-image-03.png)
 
+   > **NOTE**: 만약 대시보드 페이지가 보이지 않고 에러가 난다면 터미널에서 아래와 비슷한 URL을 클릭해서 대시보드를 열어보세요.
+   >
+   > ```text
+   > https://awesome-workshop-45397.app.github.dev/login?t=12345678abcdefgh90123456ijklmnop
+   > ```
+
 1. 터미널에서 `CTRL`+`C` 키를 눌러 애플리케이션 실행을 종료합니다.
 1. `./MafWorkshop.AppHost/appsettings.json` 파일을 열고 `LlmProvider` 값을 `AzureOpenAI`로 변경합니다.
 

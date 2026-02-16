@@ -37,7 +37,7 @@ app.MapOpenAIConversations();
 // AG-UI 미들웨어 설정하기
 app.MapAGUI(
     pattern: "ag-ui",
-    aiAgent: app.Services.GetRequiredKeyedService<AIAgent>("publisher")
+    aiAgent: app.Services.GetRequiredKeyedService<AIAgent>("writer")
 );
 
 if (builder.Environment.IsDevelopment() == false)
@@ -48,6 +48,8 @@ else
 {
     app.MapDevUI();
 }
+
+app.MapGet("/", () => Results.Redirect("/devui"));
 
 await app.RunAsync();
 

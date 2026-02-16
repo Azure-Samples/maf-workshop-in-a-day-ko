@@ -71,6 +71,8 @@ else
     app.MapDevUI();
 }
 
+app.MapGet("/", () => Results.Redirect("/devui"));
+
 await app.RunAsync();
 
 // AgentTools 클래스 추가하기

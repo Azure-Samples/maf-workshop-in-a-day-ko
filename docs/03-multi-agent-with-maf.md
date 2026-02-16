@@ -101,9 +101,10 @@ save-points/
     dotnet run --project ./MafWorkshop.Agent
     ```
 
-1. 다른 터미널을 열고 프론트엔드 UI 애플리케이션을 실행합니다.
+1. 다른 터미널을 열고 프론트엔드 UI 애플리케이션을 실행합니다. 새 터미널에서는 `$REPOSITORY_ROOT` 값을 인식하지 못하므로 [리포지토리 루트 설정](#리포지토리-루트-설정) 섹션을 다시 다시 실행시켜야 합니다.
 
     ```bash
+    cd $REPOSITORY_ROOT/workshop
     dotnet watch run --project ./MafWorkshop.WebUI
     ```
 
@@ -399,7 +400,7 @@ save-points/
 
 ## 완성본 결과 확인
 
-이 세션의 완성본은 `$REPOSITORY_ROOT/save-points/step-01/complete`에서 확인할 수 있습니다.
+이 세션의 완성본은 `$REPOSITORY_ROOT/save-points/step-03/complete`에서 확인할 수 있습니다.
 
 1. 앞서 실습한 `workshop` 디렉토리가 있다면 삭제하거나 다른 이름으로 바꿔주세요. 예) `workshop-step-03`
 1. 터미널을 열고 아래 명령어를 차례로 실행시켜 실습 디렉토리를 만들고 시작 프로젝트를 복사합니다.

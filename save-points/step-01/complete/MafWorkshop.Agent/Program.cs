@@ -43,6 +43,9 @@ else
     app.MapDevUI();
 }
 
+// /devui 엔드포인트 자동 포워딩 설정하기
+app.MapGet("/", () => Results.Redirect("/devui"));
+
 await app.RunAsync();
 
 // ChatClientFactory 클래스 추가하기
