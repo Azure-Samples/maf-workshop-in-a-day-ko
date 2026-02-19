@@ -11,7 +11,7 @@ using Microsoft.Extensions.AI;
 
 var builder = WebApplication.CreateBuilder(args);
 
-IChatClient? chatClient = ChatClientFactory.CreateChatClient(builder.Configuration);
+IChatClient? chatClient = await ChatClientFactory.CreateChatClientAsync(builder.Configuration, args);
 
 builder.Services.AddChatClient(chatClient);
 

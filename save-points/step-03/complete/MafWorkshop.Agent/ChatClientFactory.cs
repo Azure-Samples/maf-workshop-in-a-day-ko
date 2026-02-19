@@ -2,6 +2,8 @@ using System.ClientModel;
 
 using Microsoft.Extensions.AI;
 
+using OllamaSharp;
+
 using OpenAI;
 using OpenAI.Responses;
 
@@ -11,23 +13,67 @@ namespace MafWorkshop.Agent;
 
 public class ChatClientFactory
 {
-    public static IChatClient CreateChatClient(IConfiguration config)
+    public static async Task<IChatClient> CreateChatClientAsync(IConfiguration config, IEnumerable<string> args)
     {
-        var provider = config["LlmProvider"] ?? throw new InvalidOperationException("Missing configuration: LlmProvider");
+        var provider = config["LlmProvider"];
+        foreach (var arg in args)
+        {
+            var index = args.ToList().IndexOf(arg);
+            switch (arg)
+            {
+                case "--provider":
+                    provider = args.ToList()[index + 1];
+                    break;
+            }
+        }
+        if (string.IsNullOrWhiteSpace(provider))
+        {
+            throw new InvalidOperationException("Missing configuration: LlmProvider");
+        }
+
         IChatClient chatClient = provider switch
         {
-            "GitHubModels" => CreateGitHubModelsChatClient(config),
-            "AzureOpenAI" => CreateAzureOpenAIChatClient(config),
+            "Ollama" => await CreateOllamaChatClientAsync(config, provider),
+            "GitHubModels" => await CreateGitHubModelsChatClientAsync(config, provider),
+            "AzureOpenAI" => await CreateAzureOpenAIChatClientAsync(config, provider),
             _ => throw new NotSupportedException($"The specified LLM provider '{provider}' is not supported.")
         };
 
         return chatClient;
     }
 
-    private static IChatClient CreateGitHubModelsChatClient(IConfiguration config)
+    private static async Task<IChatClient> CreateOllamaChatClientAsync(IConfiguration config, string provider)
     {
-        var provider = config["LlmProvider"];
+        var ollama = config.GetSection("Ollama");
+        var endpoint = ollama["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: Ollama:Endpoint");
+        var model = ollama["Model"] ?? throw new InvalidOperationException("Missing configuration: Ollama:Model");
 
+        Console.WriteLine();
+        Console.WriteLine($"\tUsing {provider}: {model}");
+        Console.WriteLine();
+
+        var client = new OllamaApiClient(endpoint, model);
+
+        var pulls = client.PullModelAsync(model);
+        var status = default(string);
+        await foreach (var pull in pulls)
+        {
+            if (status == pull?.Status)
+            {
+                continue;
+            }
+
+            Console.WriteLine($"Pulling model '{model}': {pull?.Status}");
+            status = pull?.Status;
+        }
+
+        var chatClient = client as IChatClient;
+
+        return chatClient;
+    }
+
+    private static async Task<IChatClient> CreateGitHubModelsChatClientAsync(IConfiguration config, string provider)
+    {
         var github = config.GetSection("GitHub");
         var endpoint = github["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Endpoint");
         var token = github["Token"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Token");
@@ -47,13 +93,11 @@ public class ChatClientFactory
         var chatClient = client.GetChatClient(model)
                                .AsIChatClient();
 
-        return chatClient;
+        return await Task.FromResult(chatClient);
     }
 
-    private static IChatClient CreateAzureOpenAIChatClient(IConfiguration config)
+    private static async Task<IChatClient> CreateAzureOpenAIChatClientAsync(IConfiguration config, string provider)
     {
-        var provider = config["LlmProvider"];
-
         var azure = config.GetSection("Azure:OpenAI");
         var endpoint = azure["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:Endpoint");
         var apiKey = azure["ApiKey"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:ApiKey");
@@ -72,6 +116,6 @@ public class ChatClientFactory
         var client = new ResponsesClient(deploymentName, credential, options);
         var chatClient = client.AsIChatClient();
 
-        return chatClient;
+        return await Task.FromResult(chatClient);
     }
 }

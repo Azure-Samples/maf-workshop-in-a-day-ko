@@ -32,6 +32,7 @@
 
     protected override void OnInitialized()
     {
+        chatOptions.ResponseFormat = ChatResponseFormat.Text;
         statefulMessageCount = 0;
         messages.Add(new(ChatRole.System, SystemPrompt));
     }
