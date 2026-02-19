@@ -73,19 +73,18 @@ public class ChatClientFactory
 
         IChatClient chatClient = provider switch
         {
-            "Ollama" => await CreateOllamaChatClientAsync(config),
-            "GitHubModels" => await CreateGitHubModelsChatClientAsync(config),
-            "AzureOpenAI" => await CreateAzureOpenAIChatClientAsync(config),
+            "Ollama" => await CreateOllamaChatClientAsync(config, provider),
+            "GitHubModels" => await CreateGitHubModelsChatClientAsync(config, provider),
+            "AzureOpenAI" => await CreateAzureOpenAIChatClientAsync(config, provider),
             _ => throw new NotSupportedException($"The specified LLM provider '{provider}' is not supported.")
         };
 
         return chatClient;
     }
 
-    private static async Task<IChatClient> CreateOllamaChatClientAsync(IConfiguration config)
+    // CreateOllamaChatClientAsync 메서드 추가하기
+    private static async Task<IChatClient> CreateOllamaChatClientAsync(IConfiguration config, string provider)
     {
-        var provider = config["LlmProvider"];
-
         var ollama = config.GetSection("Ollama");
         var endpoint = ollama["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: Ollama:Endpoint");
         var model = ollama["Model"] ?? throw new InvalidOperationException("Missing configuration: Ollama:Model");
@@ -114,10 +113,9 @@ public class ChatClientFactory
         return chatClient;
     }
 
-    private static async Task<IChatClient> CreateGitHubModelsChatClientAsync(IConfiguration config)
+    // CreateGitHubModelsChatClientAsync 메서드 추가하기
+    private static async Task<IChatClient> CreateGitHubModelsChatClientAsync(IConfiguration config, string provider)
     {
-        var provider = config["LlmProvider"];
-
         var github = config.GetSection("GitHub");
         var endpoint = github["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Endpoint");
         var token = github["Token"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Token");
@@ -140,10 +138,9 @@ public class ChatClientFactory
         return await Task.FromResult(chatClient);
     }
 
-    private static async Task<IChatClient> CreateAzureOpenAIChatClientAsync(IConfiguration config)
+    // CreateAzureOpenAIChatClientAsync 메서드 추가하기
+    private static async Task<IChatClient> CreateAzureOpenAIChatClientAsync(IConfiguration config, string provider)
     {
-        var provider = config["LlmProvider"];
-
         var azure = config.GetSection("Azure:OpenAI");
         var endpoint = azure["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:Endpoint");
         var apiKey = azure["ApiKey"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:ApiKey");

@@ -136,71 +136,141 @@ save-points/
     }
     ```
 
-1. `./MafWorkshop.Agent/Program.cs` 파일을 열고 `// ChatClientFactory 클래스 추가하기` 주석을 찾아 아래 내용을 추가합니다. 아래 코드는 `IConfiguration` 인스턴스에서 `LlmProvider` 값을 찾아 그 값이 `GitHubModels`이면 GitHub Models 연결 정보를 이용해서 `IChatClient` 인스턴스를 생성하고, `AzureOpenAI`이면 Azure OpenAI 연결 정보를 이용해서 `IChatClient` 인스턴스를 생성하는 팩토리 메서드 패턴입니다.
+1. `./MafWorkshop.Agent/Program.cs` 파일을 열고 `// ChatClientFactory 클래스 추가하기` 주석을 찾아 아래 내용을 추가합니다. 아래 코드는 앱 실행시 `IConfiguration` 인스턴스에서 `LlmProvider` 값과 커맨드라인 파라미터 값을 찾아 그 값을 바탕으로 `IChatClient` 인스턴스를 생성하는 팩토리 메서드 패턴입니다.
+   - `Ollama`: Ollama 연결 정보를 이용해서 `IChatClient` 인스턴스를 생성합니다.
+   - `GitHubModels`: GitHub Models 연결 정보를 이용해서 `IChatClient` 인스턴스를 생성합니다.
+   - `AzureOpenAI`: Azure OpenAI 연결 정보를 이용해서 `IChatClient` 인스턴스를 생성합니다.
 
     ```csharp
     // ChatClientFactory 클래스 추가하기
     public class ChatClientFactory
     {
-        public static IChatClient CreateChatClient(IConfiguration config)
+        public static async Task<IChatClient> CreateChatClientAsync(IConfiguration config, IEnumerable<string> args)
         {
-            var provider = config["LlmProvider"] ?? throw new InvalidOperationException("Missing configuration: LlmProvider");
+            var provider = config["LlmProvider"];
+            foreach (var arg in args)
+            {
+                var index = args.ToList().IndexOf(arg);
+                switch (arg)
+                {
+                    case "--provider":
+                        provider = args.ToList()[index + 1];
+                        break;
+                }
+            }
+            if (string.IsNullOrWhiteSpace(provider))
+            {
+                throw new InvalidOperationException("Missing configuration: LlmProvider");
+            }
+    
             IChatClient chatClient = provider switch
             {
-                "GitHubModels" => CreateGitHubModelsChatClient(config),
-                "AzureOpenAI" => CreateAzureOpenAIChatClient(config),
+                "Ollama" => await CreateOllamaChatClientAsync(config, provider),
+                "GitHubModels" => await CreateGitHubModelsChatClientAsync(config, provider),
+                "AzureOpenAI" => await CreateAzureOpenAIChatClientAsync(config, provider),
                 _ => throw new NotSupportedException($"The specified LLM provider '{provider}' is not supported.")
             };
     
             return chatClient;
         }
     
-        private static IChatClient CreateGitHubModelsChatClient(IConfiguration config)
+        // CreateOllamaChatClientAsync 메서드 추가하기
+
+        // CreateGitHubModelsChatClientAsync 메서드 추가하기
+    
+        // CreateAzureOpenAIChatClientAsync 메서드 추가하기
+    }
+    ```
+
+1. 같은 파일에서 `// CreateOllamaChatClientAsync 메서드 추가하기` 주석을 찾아 아래 내용을 추가합니다. Ollama 서버 연결 정보를 통해 `IChatClient` 인스턴스를 생성하는 코드입니다.
+
+    ```csharp
+    // CreateOllamaChatClientAsync 메서드 추가하기
+    private static async Task<IChatClient> CreateOllamaChatClientAsync(IConfiguration config, string provider)
+    {
+        var ollama = config.GetSection("Ollama");
+        var endpoint = ollama["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: Ollama:Endpoint");
+        var model = ollama["Model"] ?? throw new InvalidOperationException("Missing configuration: Ollama:Model");
+
+        Console.WriteLine();
+        Console.WriteLine($"\tUsing {provider}: {model}");
+        Console.WriteLine();
+
+        var client = new OllamaApiClient(endpoint, model);
+
+        var pulls = client.PullModelAsync(model);
+        var status = default(string);
+        await foreach (var pull in pulls)
         {
-            var provider = config["LlmProvider"];
-    
-            var github = config.GetSection("GitHub");
-            var endpoint = github["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Endpoint");
-            var token = github["Token"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Token");
-            var model = github["Model"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Model");
-    
-            Console.WriteLine($"Using {provider}: {model}");
-    
-            var credential = new ApiKeyCredential(token);
-            var options = new OpenAIClientOptions()
+            if (status == pull?.Status)
             {
-                Endpoint = new Uri(endpoint)
-            };
-    
-            var client = new OpenAIClient(credential, options);
-            var chatClient = client.GetChatClient(model)
-                                   .AsIChatClient();
-    
-            return chatClient;
+                continue;
+            }
+
+            Console.WriteLine($"Pulling model '{model}': {pull?.Status}");
+            status = pull?.Status;
         }
-    
-        private static IChatClient CreateAzureOpenAIChatClient(IConfiguration config)
+
+        var chatClient = client as IChatClient;
+
+        return chatClient;
+    }
+    ```
+
+1. 같은 파일에서 `// CreateGitHubModelsChatClientAsync 메서드 추가하기` 주석을 찾아 아래 내용을 추가합니다. GitHub Models 연결 정보를 통해 `IChatClient` 인스턴스를 생성하는 코드입니다.
+
+    ```csharp
+    // CreateGitHubModelsChatClientAsync 메서드 추가하기
+    private static async Task<IChatClient> CreateGitHubModelsChatClientAsync(IConfiguration config, string provider)
+    {
+        var github = config.GetSection("GitHub");
+        var endpoint = github["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Endpoint");
+        var token = github["Token"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Token");
+        var model = github["Model"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Model");
+
+        Console.WriteLine();
+        Console.WriteLine($"\tUsing {provider}: {model}");
+        Console.WriteLine();
+
+        var credential = new ApiKeyCredential(token);
+        var options = new OpenAIClientOptions()
         {
-            var provider = config["LlmProvider"];
-    
-            var azure = config.GetSection("Azure:OpenAI");
-            var endpoint = azure["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:Endpoint");
-            var apiKey = azure["ApiKey"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:ApiKey");
-            var deploymentName = azure["DeploymentName"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:DeploymentName");
-    
-            Console.WriteLine($"Using {provider}: {deploymentName}");
-    
-            var credential = new ApiKeyCredential(apiKey);
-            var options = new OpenAIClientOptions
-            {
-                Endpoint = new Uri($"{endpoint.TrimEnd('/')}/openai/v1/")
-            };
-    
-            var client = new ResponsesClient(deploymentName, credential, options);
-            var chatClient = client.AsIChatClient();
-    
-            return chatClient;
-        }
+            Endpoint = new Uri(endpoint)
+        };
+
+        var client = new OpenAIClient(credential, options);
+        var chatClient = client.GetChatClient(model)
+                                .AsIChatClient();
+
+        return await Task.FromResult(chatClient);
+    }
+    ```
+
+1. 같은 파일에서 `// CreateAzureOpenAIChatClientAsync 메서드 추가하기` 주석을 찾아 아래 내용을 추가합니다. Azure OpenAI 연결 정보를 통해 `IChatClient` 인스턴스를 생성하는 코드입니다.
+
+    ```csharp
+    // CreateAzureOpenAIChatClientAsync 메서드 추가하기
+    private static async Task<IChatClient> CreateAzureOpenAIChatClientAsync(IConfiguration config, string provider)
+    {
+        var azure = config.GetSection("Azure:OpenAI");
+        var endpoint = azure["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:Endpoint");
+        var apiKey = azure["ApiKey"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:ApiKey");
+        var deploymentName = azure["DeploymentName"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:DeploymentName");
+
+        Console.WriteLine();
+        Console.WriteLine($"\tUsing {provider}: {deploymentName}");
+        Console.WriteLine();
+
+        var credential = new ApiKeyCredential(apiKey);
+        var options = new OpenAIClientOptions
+        {
+            Endpoint = new Uri($"{endpoint.TrimEnd('/')}/openai/v1/")
+        };
+
+        var client = new ResponsesClient(deploymentName, credential, options);
+        var chatClient = client.AsIChatClient();
+
+        return await Task.FromResult(chatClient);
     }
     ```
 
@@ -208,7 +278,7 @@ save-points/
 
     ```csharp
     // IChatClient 인스턴스 생성하기
-    IChatClient? chatClient = ChatClientFactory.CreateChatClient(builder.Configuration);
+    IChatClient? chatClient = await ChatClientFactory.CreateChatClientAsync(builder.Configuration, args);
     ```
 
 1. 같은 파일에서 `// IChatClient 인스턴스 등록하기` 주석을 찾아 아래와 같이 입력합니다. 앞서 생성한 `IChatClient` 인스턴스를 의존성 개체로 등록합니다.
@@ -283,6 +353,8 @@ save-points/
 
 ## 단일 에이전트 실행
 
+### GitHub Models 활용
+
 1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
 
     ```bash
@@ -329,7 +401,17 @@ save-points/
    > }
    > ```
 
-1. **Azure 구독이 있을 경우** `./MafWorkshop.Agent/appsettings.json` 파일을 열어 아래와 같이 `LlmProvider` 값을 `AzureOpenAI`로 바꿔봅니다.
+### Azure OpenAI 활용
+
+> **Azure 구독이 있을 경우** 실행해 보세요.
+
+1. 워크샵 디렉토리에 있는지 다시 한 번 확인합니다.
+
+    ```bash
+    cd $REPOSITORY_ROOT/workshop
+    ```
+
+1. `./MafWorkshop.Agent/appsettings.json` 파일을 열어 아래와 같이 `LlmProvider` 값을 `AzureOpenAI`로 바꿔봅니다.
 
     ```jsonc
     {
@@ -359,6 +441,52 @@ save-points/
 
     ```bash
     dotnet watch run --project ./MafWorkshop.Agent
+    ```
+
+1. 자동으로 웹 브라우저가 열리면서 DevUI 페이지가 나타나는지 확인합니다.
+
+   ![DevUI 페이지 - 단일 에이전트](./images/step-01-image-02.png)
+
+   메시지를 보내고 결과를 확인해 봅니다.
+
+   ![Writer 에이전트 실행 결과](./images/step-01-image-03.png)
+
+1. 터미널에서 `CTRL`+`C` 키를 눌러 애플리케이션 실행을 종료합니다.
+
+### Ollama 활용
+
+> **Ollama 서버를 활용한 로컬 LLM**을 활용할 경우 실행해 보세요.
+
+1. 터미널에서 Ollama 서버를 실행시킵니다.
+
+    ```bash
+    ollama serve
+    ```
+
+1. 새 터미널을 열고 워크샵 디렉토리로 이동합니다. 새 터미널에서는 `$REPOSITORY_ROOT` 값을 인식하지 못하므로 [리포지토리 루트 설정](#리포지토리-루트-설정) 섹션을 다시 다시 실행시켜야 합니다.
+
+    ```bash
+    cd $REPOSITORY_ROOT/workshop
+    ```
+
+1. 애플리케이션을 실행합니다. 이번에는 커맨드라인 파라미터를 이용해서 `LlmProvider` 값을 변경합니다.
+
+    ```bash
+    dotnet run --project ./MafWorkshop.Agent -- --provider Ollama
+    ```
+
+1. 터미널에 현재 Ollama를 연결했다는 메시지가 나타나는 것을 확인합니다.
+
+    ```text
+    Using Ollama: gemma3:1b
+    ```
+
+1. 터미널에서 `CTRL`+`C`를 눌러 애플리케이션을 종료합니다.
+
+1. 다시 애플리케이션을 실행합니다.
+
+    ```bash
+    dotnet watch run --project ./MafWorkshop.Agent -- --provider Ollama
     ```
 
 1. 자동으로 웹 브라우저가 열리면서 DevUI 페이지가 나타나는지 확인합니다.

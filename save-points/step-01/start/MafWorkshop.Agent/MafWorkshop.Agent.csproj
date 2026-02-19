@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.Agents.AI.Hosting" Version="1.*-*" />
     <PackageReference Include="Microsoft.Agents.AI.Hosting.OpenAI" Version="1.*-*" />
     <PackageReference Include="Microsoft.Agents.AI.OpenAI" Version="1.*-*" />
+    <PackageReference Include="OllamaSharp" Version="5.*" />
   </ItemGroup>
 
 </Project>
