@@ -15,10 +15,7 @@
     "ghcr.io/devcontainers/features/docker-in-docker:latest": {},
     "ghcr.io/devcontainers/features/github-cli:latest": {},
     "ghcr.io/devcontainers/features/kubectl-helm-minikube:latest": {},
-    "ghcr.io/devcontainers/features/node:latest": {},
-    "ghcr.io/prulloac/devcontainer-features/ollama:latest": {
-      "pull": "gemma3:1b"
-    }
+    "ghcr.io/devcontainers/features/node:latest": {}
   },
 
   "overrideFeatureInstallOrder": [
