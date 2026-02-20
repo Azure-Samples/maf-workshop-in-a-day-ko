@@ -213,66 +213,101 @@ save-points/
     // LlmResourceFactory 클래스 추가하기
     public static class LlmResourceFactory
     {
-        public static IResourceBuilder<ProjectResource> WithLlmReference(this IResourceBuilder<ProjectResource> source, IConfiguration config)
+        public static IResourceBuilder<ProjectResource> WithLlmReference(this IResourceBuilder<ProjectResource> source, IConfiguration config, IEnumerable<string> args)
         {
-            var provider = config["LlmProvider"] ?? throw new InvalidOperationException("Missing configuration: LlmProvider");
+            var provider = config["LlmProvider"];
+
+            // 커맨드라인 파라미터 확인 로직 추가하기
+
+            if (string.IsNullOrWhiteSpace(provider))
+            {
+                throw new InvalidOperationException("Missing configuration: LlmProvider");
+            }
+
             source = provider switch
             {
-                "GitHubModels" => AddGitHubModelsResource(source, config),
-                "AzureOpenAI" => AddAzureOpenAIResource(source, config),
+                "GitHubModels" => source.AddGitHubModelsResource(config, provider),
+                "AzureOpenAI" => source.AddAzureOpenAIResource(config, provider),
                 _ => throw new NotSupportedException($"The specified LLM provider '{provider}' is not supported.")
             };
-    
+
             return source;
         }
-    
-        private static IResourceBuilder<ProjectResource> AddGitHubModelsResource(IResourceBuilder<ProjectResource> source, IConfiguration config)
+
+        // AddGitHubModelsResource 메서드 추가하기
+
+        // AddAzureOpenAIResource 메서드 추가하기
+
+    }
+    ```
+
+1. 같은 파일에서 `// 커맨드라인 파라미터 확인 로직 추가하기` 주석을 찾아 아래 내용을 추가합니다. 커맨드라인 파라미터의 `--provider` 값을 확인해서 기존 `appsettings.json` 파일의 값보다 우선적으로 적용할 수 있도록 합니다.
+
+    ```csharp
+    // 커맨드라인 파라미터 확인 로직 추가하기
+    foreach (var arg in args)
+    {
+        var index = args.ToList().IndexOf(arg);
+        switch (arg)
         {
-            var provider = config["LlmProvider"];
-    
-            var github = config.GetSection("GitHub");
-            var endpoint = github["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Endpoint");
-            var token = github["Token"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Token");
-            var model = github["Model"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Model");
-    
-            Console.WriteLine();
-            Console.WriteLine($"\tUsing {provider}: {model}");
-            Console.WriteLine();
-    
-            var apiKey = source.ApplicationBuilder
-                               .AddParameter(name: "apiKey", value: token, secret: true);
-            var chat = source.ApplicationBuilder
-                             .AddGitHubModel(name: "chat", model: model)
-                             .WithApiKey(apiKey);
-    
-            return source.WithReference(chat)
-                         .WaitFor(chat);
+            case "--provider":
+                provider = args.ToList()[index + 1];
+                break;
         }
-    
-        private static IResourceBuilder<ProjectResource> AddAzureOpenAIResource(IResourceBuilder<ProjectResource> source, IConfiguration config)
-        {
-            var provider = config["LlmProvider"];
-    
-            var azure = config.GetSection("Azure:OpenAI");
-            var endpoint = azure["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:Endpoint");
-            var accessKey = azure["ApiKey"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:ApiKey");
-            var deploymentName = azure["DeploymentName"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:DeploymentName");
-    
-            Console.WriteLine();
-            Console.WriteLine($"\tUsing {provider}: {deploymentName}");
-            Console.WriteLine();
-    
-            var apiKey = source.ApplicationBuilder
-                               .AddParameter(name: "apiKey", value: accessKey, secret: true);
-            var chat = source.ApplicationBuilder
-                             .AddOpenAI("openai")
-                             .WithEndpoint($"{endpoint.TrimEnd('/')}/openai/v1/")
-                             .WithApiKey(apiKey)
-                             .AddModel(name: "chat", model: deploymentName);
-    
-            return source.WithReference(chat)
-                         .WaitFor(chat);
-        }
+    }
+    ```
+
+1. 같은 파일에서 `// AddGitHubModelsResource 메서드 추가하기` 주석을 찾아 아래와 같이 입력합니다. GitHub Models 연결 정보를 통해 LLM 리소스를 연결합니다.
+
+    ```csharp
+    // AddGitHubModelsResource 메서드 추가하기
+    private static IResourceBuilder<ProjectResource> AddGitHubModelsResource(this IResourceBuilder<ProjectResource> source, IConfiguration config, string provider)
+    {
+        var github = config.GetSection("GitHub");
+        var endpoint = github["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Endpoint");
+        var token = github["Token"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Token");
+        var model = github["Model"] ?? throw new InvalidOperationException("Missing configuration: GitHub:Model");
+
+        Console.WriteLine();
+        Console.WriteLine($"\tUsing {provider}: {model}");
+        Console.WriteLine();
+
+        var apiKey = source.ApplicationBuilder
+                           .AddParameter(name: "apiKey", value: token, secret: true);
+        var chat = source.ApplicationBuilder
+                         .AddGitHubModel(name: "chat", model: model)
+                         .WithApiKey(apiKey);
+
+        return source.WithReference(chat)
+                     .WaitFor(chat);
+    }
+    ```
+
+1. 같은 파일에서 `// AddAzureOpenAIResource 메서드 추가하기` 주석을 찾아 아래와 같이 입력합니다. Azure OpenAI 연결 정보를 통해 LLM 리소스를 연결합니다.
+
+    ```csharp
+    // AddAzureOpenAIResource 메서드 추가하기
+    private static IResourceBuilder<ProjectResource> AddAzureOpenAIResource(this IResourceBuilder<ProjectResource> source, IConfiguration config, string provider)
+    {
+        var azure = config.GetSection("Azure:OpenAI");
+        var endpoint = azure["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:Endpoint");
+        var accessKey = azure["ApiKey"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:ApiKey");
+        var deploymentName = azure["DeploymentName"] ?? throw new InvalidOperationException("Missing configuration: Azure:OpenAI:DeploymentName");
+
+        Console.WriteLine();
+        Console.WriteLine($"\tUsing {provider}: {deploymentName}");
+        Console.WriteLine();
+
+        var apiKey = source.ApplicationBuilder
+                           .AddParameter(name: "apiKey", value: accessKey, secret: true);
+        var chat = source.ApplicationBuilder
+                         .AddOpenAI("openai")
+                         .WithEndpoint($"{endpoint.TrimEnd('/')}/openai/v1/")
+                         .WithApiKey(apiKey)
+                         .AddModel(name: "chat", model: deploymentName);
+
+        return source.WithReference(chat)
+                     .WaitFor(chat);
     }
     ```
 
@@ -282,7 +317,7 @@ save-points/
     // 백엔드 에이전트 프로젝트 추가하기
     var agent = builder.AddProject<Projects.MafWorkshop_Agent>("agent")
                        .WithExternalHttpEndpoints()
-                       .WithLlmReference(builder.Configuration);
+                       .WithLlmReference(builder.Configuration, args);
     ```
 
 1. 같은 파일에서 `// 프론트엔드 웹 UI 프로젝트 추가하기` 주석을 찾아 아래와 같이 입력합니다. 프론트엔드 웹 UI 앱을 `webUI`라는 리소스로 선언하고 거기에 방금 작성한 `agent` 리소스를 연결합니다.
@@ -413,6 +448,12 @@ save-points/
     {
       "LlmProvider": "AzureOpenAI"
     }
+    ```
+
+   또는 커맨드라인 파라미터를 통해 `LlmProvider` 값을 `AzureOpenAI`로 변경해 보세요.
+
+    ```bash
+    dotnet watch run --project ./MafWorkshop.AppHost -- --provider AzureOpenAI
     ```
 
 1. 다시 Aspire 오케스트레이션 앱을 실행시켜 아래와 같은 Aspire 대시보드 페이지가 나타나는지 확인합니다.

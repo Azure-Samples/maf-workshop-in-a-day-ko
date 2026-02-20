@@ -149,7 +149,7 @@ save-points/
         {
             var provider = config["LlmProvider"];
 
-            // 커맨드라인 파라미터 확인 로직 추가
+            // 커맨드라인 파라미터 확인 로직 추가하기
 
             if (string.IsNullOrWhiteSpace(provider))
             {
@@ -175,10 +175,10 @@ save-points/
     }
     ```
 
-1. 같은 파일에서 `// 커맨드라인 파라미터 확인 로직 추가` 주석을 찾아 아래 내용을 추가합니다. 커맨드라인 파라미터의 `--provider` 값을 확인해서 기존 `appsettings.json` 파일의 값보다 우선적으로 적용할 수 있도록 합니다.
+1. 같은 파일에서 `// 커맨드라인 파라미터 확인 로직 추가하기` 주석을 찾아 아래 내용을 추가합니다. 커맨드라인 파라미터의 `--provider` 값을 확인해서 기존 `appsettings.json` 파일의 값보다 우선적으로 적용할 수 있도록 합니다.
 
     ```csharp
-    // 커맨드라인 파라미터 확인 로직 추가
+    // 커맨드라인 파라미터 확인 로직 추가하기
     foreach (var arg in args)
     {
         var index = args.ToList().IndexOf(arg);
@@ -249,7 +249,7 @@ save-points/
 
         var client = new OpenAIClient(credential, options);
         var chatClient = client.GetChatClient(model)
-                                .AsIChatClient();
+                               .AsIChatClient();
 
         return await Task.FromResult(chatClient);
     }

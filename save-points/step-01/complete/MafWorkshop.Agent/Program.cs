@@ -57,7 +57,7 @@ public class ChatClientFactory
     {
         var provider = config["LlmProvider"];
 
-        // 커맨드라인 파라미터 확인 로직 추가
+        // 커맨드라인 파라미터 확인 로직 추가하기
         foreach (var arg in args)
         {
             var index = args.ToList().IndexOf(arg);
