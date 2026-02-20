@@ -42,6 +42,9 @@
 
     # Aspire CLI
     aspire --version
+
+    # Ollama
+    ollama --version
     ```
 
 1. GitHub 리포지토리 상태를 확인합니다.
@@ -107,6 +110,37 @@
     # PowerShell
     $REPOSITORY_ROOT = git rev-parse --show-toplevel
     ```
+
+## Ollama 설정
+
+> **NOTE**: 로컬 LLM을 활용하고 싶을 경우 진행하세요.
+
+1. 터미널에서 아래 명령어를 입력해서 Ollama 서버를 실행합니다. 편의상 이 터미널을 **터미널 1**이라고 하겠습니다.
+
+    ```bash
+    ollama serve
+    ```
+
+1. 새 터미널을 열고 아래 명령어를 통해 LLM을 실행시킵니다. 편의상 이 터미널을 **터미널 2**라고 하겠습니다. 여기서는 편의상 [granite4:350m](https://ollama.com/library/granite4:350m) 모델을 사용합니다.
+
+    ```bash
+    ollama run granite4:350m
+    ```
+
+1. **터미널 2**에서 프롬프트를 아무거나 입력해 봅니다.
+
+    ```text
+    하늘은 왜 파랄까?
+    Why is the sky blue?
+    ```
+
+1. **터미널 2**에서 응답을 확인한 후 아래 커맨드를 입력해서 Ollma 모델 실행을 종료합니다.
+
+    ```bash
+    /exit
+    ```
+
+1. **터미널 1**에서 `CTRL`+`C` 키를 눌러 Ollama 서버 실행을 종료합니다.
 
 ## GitHub Models 설정
 

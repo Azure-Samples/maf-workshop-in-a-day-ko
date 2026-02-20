@@ -136,7 +136,7 @@ save-points/
     }
     ```
 
-1. `./MafWorkshop.Agent/Program.cs` 파일을 열고 `// ChatClientFactory 클래스 추가하기` 주석을 찾아 아래 내용을 추가합니다. 아래 코드는 앱 실행시 `IConfiguration` 인스턴스에서 `LlmProvider` 값과 커맨드라인 파라미터 값을 찾아 그 값을 바탕으로 `IChatClient` 인스턴스를 생성하는 팩토리 메서드 패턴입니다.
+1. `./MafWorkshop.Agent/Program.cs` 파일을 열고 `// ChatClientFactory 클래스 추가하기` 주석을 찾아 아래 내용을 추가합니다. 아래 코드는 앱 실행시 `IConfiguration` 인스턴스에서 `LlmProvider` 값을 찾아 그 값을 바탕으로 `IChatClient` 인스턴스를 생성하는 팩토리 메서드 패턴입니다.
    - `Ollama`: Ollama 연결 정보를 이용해서 `IChatClient` 인스턴스를 생성합니다.
    - `GitHubModels`: GitHub Models 연결 정보를 이용해서 `IChatClient` 인스턴스를 생성합니다.
    - `AzureOpenAI`: Azure OpenAI 연결 정보를 이용해서 `IChatClient` 인스턴스를 생성합니다.
@@ -148,16 +148,9 @@ save-points/
         public static async Task<IChatClient> CreateChatClientAsync(IConfiguration config, IEnumerable<string> args)
         {
             var provider = config["LlmProvider"];
-            foreach (var arg in args)
-            {
-                var index = args.ToList().IndexOf(arg);
-                switch (arg)
-                {
-                    case "--provider":
-                        provider = args.ToList()[index + 1];
-                        break;
-                }
-            }
+
+            // 커맨드라인 파라미터 확인 로직 추가
+
             if (string.IsNullOrWhiteSpace(provider))
             {
                 throw new InvalidOperationException("Missing configuration: LlmProvider");
@@ -179,6 +172,22 @@ save-points/
         // CreateGitHubModelsChatClientAsync 메서드 추가하기
     
         // CreateAzureOpenAIChatClientAsync 메서드 추가하기
+    }
+    ```
+
+1. 같은 파일에서 `// 커맨드라인 파라미터 확인 로직 추가` 주석을 찾아 아래 내용을 추가합니다. 커맨드라인 파라미터의 `--provider` 값을 확인해서 기존 `appsettings.json` 파일의 값보다 우선적으로 적용할 수 있도록 합니다.
+
+    ```csharp
+    // 커맨드라인 파라미터 확인 로직 추가
+    foreach (var arg in args)
+    {
+        var index = args.ToList().IndexOf(arg);
+        switch (arg)
+        {
+            case "--provider":
+                provider = args.ToList()[index + 1];
+                break;
+        }
     }
     ```
 
@@ -455,7 +464,7 @@ save-points/
 
 ### Ollama 활용
 
-> **Ollama 서버를 활용한 로컬 LLM**을 활용할 경우 실행해 보세요.
+> **Ollama 서버를 통해 로컬 LLM**을 활용할 경우 실행해 보세요.
 
 1. 터미널에서 Ollama 서버를 실행시킵니다.
 
@@ -478,7 +487,7 @@ save-points/
 1. 터미널에 현재 Ollama를 연결했다는 메시지가 나타나는 것을 확인합니다.
 
     ```text
-    Using Ollama: gemma3:1b
+    Using Ollama: granite4:350m
     ```
 
 1. 터미널에서 `CTRL`+`C`를 눌러 애플리케이션을 종료합니다.

@@ -56,6 +56,8 @@ public class ChatClientFactory
     public static async Task<IChatClient> CreateChatClientAsync(IConfiguration config, IEnumerable<string> args)
     {
         var provider = config["LlmProvider"];
+
+        // 커맨드라인 파라미터 확인 로직 추가
         foreach (var arg in args)
         {
             var index = args.ToList().IndexOf(arg);
@@ -66,6 +68,7 @@ public class ChatClientFactory
                     break;
             }
         }
+        
         if (string.IsNullOrWhiteSpace(provider))
         {
             throw new InvalidOperationException("Missing configuration: LlmProvider");

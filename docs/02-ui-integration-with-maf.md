@@ -125,7 +125,8 @@ save-points/
     }
     ```
 
-   > **Azure 구독이 있는 경우**, `GitHubModels` 대신 `AzureOpenAI`로도 바꿔보세요.
+   > - **Azure 구독이 있는 경우**, `GitHubModels` 대신 `AzureOpenAI`로도 바꿔보세요. 물론 커맨드라인 파라미터로 `--provider AzureOpenAI`라고 해도 됩니다.
+   > - **Ollama 서버를 통해 로컬 LLM을 활용할 경우**, `GitHubModels` 대신 `Ollama`로도 바꿔보세요. 물론 커맨드라인 파라미터로 `--provider Ollama`라고 해도 됩니다.
 
 1. `./MafWorkshop.Agent/Program.cs` 파일을 열고 `// AG-UI 등록하기` 주석을 찾아 아래 내용을 추가합니다. 에이전트 앱에 AG-UI 서비스를 사용할 수 있는 서비스 인스턴스를 별도로 로직을 구현하지 않고 직접 의존성 개체로 등록합니다.
 
@@ -158,7 +159,7 @@ save-points/
     {
       "AgentEndpoints": {
         "Https": "https://localhost:45097",
-        "http": "http://localhost:5097"
+        "Http": "http://localhost:5097"
       }
     }
     ```
@@ -228,7 +229,7 @@ save-points/
 
    ![웹 UI 페이지 - 결과 확인](./images/step-02-image-03.png)
 
-   > **NOTE**: 이 시점부터 GitHub Models를 사용하다 보면 사용량 초과(rate limit) 에러가 나타날 수 있습니다. 그러면 `/MafWorkshop.Agent/appsettings.json`의 `LlmProvider` 값을 `GitHubModels`에서 `AzureOpenAI`로 바꿔 진행합니다.
+   > **NOTE**: 이 시점부터 GitHub Models를 사용하다 보면 사용량 초과(rate limit) 에러가 나타날 수 있습니다. 그러면 `/MafWorkshop.Agent/appsettings.json`의 `LlmProvider` 값을 `GitHubModels`에서 `Ollama` 또는 `AzureOpenAI`로 바꿔 진행합니다. 또는 커맨드라인 파라미터를 통해 `/MafWorkshop.Agent/appsettings.json` 파일을 직접 수정하지 않고 `LlmProvider` 값을 변경해 보세요.
 
 1. 두 터미널에서 각각 `CTRL`+`C` 키를 눌러 모든 애플리케이션 실행을 종료합니다.
 

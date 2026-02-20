@@ -2,8 +2,6 @@ using System.ClientModel;
 
 using Microsoft.Extensions.AI;
 
-using OllamaSharp;
-
 using OpenAI;
 using OpenAI.Responses;
 
@@ -33,41 +31,10 @@ public class ChatClientFactory
 
         IChatClient chatClient = provider switch
         {
-            "Ollama" => await CreateOllamaChatClientAsync(config, provider),
             "GitHubModels" => await CreateGitHubModelsChatClientAsync(config, provider),
             "AzureOpenAI" => await CreateAzureOpenAIChatClientAsync(config, provider),
             _ => throw new NotSupportedException($"The specified LLM provider '{provider}' is not supported.")
         };
-
-        return chatClient;
-    }
-
-    private static async Task<IChatClient> CreateOllamaChatClientAsync(IConfiguration config, string provider)
-    {
-        var ollama = config.GetSection("Ollama");
-        var endpoint = ollama["Endpoint"] ?? throw new InvalidOperationException("Missing configuration: Ollama:Endpoint");
-        var model = ollama["Model"] ?? throw new InvalidOperationException("Missing configuration: Ollama:Model");
-
-        Console.WriteLine();
-        Console.WriteLine($"\tUsing {provider}: {model}");
-        Console.WriteLine();
-
-        var client = new OllamaApiClient(endpoint, model);
-
-        var pulls = client.PullModelAsync(model);
-        var status = default(string);
-        await foreach (var pull in pulls)
-        {
-            if (status == pull?.Status)
-            {
-                continue;
-            }
-
-            Console.WriteLine($"Pulling model '{model}': {pull?.Status}");
-            status = pull?.Status;
-        }
-
-        var chatClient = client as IChatClient;
 
         return chatClient;
     }

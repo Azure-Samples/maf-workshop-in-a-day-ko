@@ -116,6 +116,8 @@ save-points/
 
    ![웹 UI 페이지 - 결과 확인](./images/step-03-image-02.png)
 
+   > **NOTE**: 만약 GitHub Models를 사용하다 보면 사용량 초과(rate limit) 에러가 나타날 수 있습니다. 그러면 `/MafWorkshop.Agent/appsettings.json`의 `LlmProvider` 값을 `GitHubModels`에서 `AzureOpenAI`로 바꿔 진행합니다. 또는 커맨드라인 파라미터를 통해 `/MafWorkshop.Agent/appsettings.json` 파일을 직접 수정하지 않고 `LlmProvider` 값을 변경해 보세요.
+
 1. 두 터미널에서 각각 `CTRL`+`C` 키를 눌러 모든 애플리케이션 실행을 종료합니다.
 
 ## 추가 에이전트 생성
