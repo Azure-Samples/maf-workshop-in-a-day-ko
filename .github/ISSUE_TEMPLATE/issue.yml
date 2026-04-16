@@ -1,0 +1,50 @@
+name: Issue Report
+description: File a bug report, feature request, documentation issue, or regression
+body:
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: This issue is for a
+      options:
+        - bug report
+        - feature request
+        - documentation issue or request
+        - regression (a behavior that used to work and stopped in a new release)
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Minimal steps to reproduce
+      description: Provide the steps to reproduce the issue.
+    validations:
+      required: true
+
+  - type: textarea
+    id: log-messages
+    attributes:
+      label: Any log messages given by the failure
+      render: shell
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected/desired behavior
+
+  - type: input
+    id: os-version
+    attributes:
+      label: OS and Version
+      placeholder: e.g. Windows 10, Ubuntu 24.04, macOS Sequoia
+
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      placeholder: e.g. .NET 10.0, Node 22
+
+  - type: textarea
+    id: other-details
+    attributes:
+      label: Mention any other details that might be useful
