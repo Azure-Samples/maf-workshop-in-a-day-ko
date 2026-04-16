@@ -276,8 +276,8 @@ save-points/
             Endpoint = new Uri($"{endpoint.TrimEnd('/')}/openai/v1/")
         };
 
-        var client = new ResponsesClient(deploymentName, credential, options);
-        var chatClient = client.AsIChatClient();
+        var client = new ResponsesClient(credential, options);
+        var chatClient = client.AsIChatClient(deploymentName);
 
         return await Task.FromResult(chatClient);
     }
