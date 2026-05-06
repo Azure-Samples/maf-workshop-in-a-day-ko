@@ -150,11 +150,11 @@
 
 1. PAT 생성 후 잘 보관해 둡니다. 한 번 생성한 토큰은 나중에 다시 확인할 수 없으므로 분실할 경우 새로 생성해야 합니다.
 
-1. 아래 명령의 `{{GITHUB_PAT}}` 부분을 **앞서 생성한 실제 PAT 값으로 치환**하여 실행합니다. Fine-grained PAT는 `github_pat_`로 시작하는 문자열입니다.
+1. 아래 명령어의 `{{GITHUB_PAT}}` 부분을 **앞서 생성한 실제 PAT 값으로 치환**하여 실행합니다. Fine-grained PAT는 `github_pat_`로 시작하는 문자열입니다.
 
     ```bash
     # zsh/bash
-    githubToken="{{GITHUB_PAT}}"   # 예: githubToken="github_pat_11ABC...XYZ"
+    githubToken="{{GITHUB_PAT}}"      # 예: githubToken="github_pat_11ABC...XYZ"
     ```
 
     ```powershell

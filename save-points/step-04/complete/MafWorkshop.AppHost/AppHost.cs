@@ -4,7 +4,6 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 // 백엔드 에이전트 프로젝트 추가하기
 var agent = builder.AddProject<Projects.MafWorkshop_Agent>("agent")
-                   .WithExternalHttpEndpoints()
                    .WithLlmReference(builder.Configuration, args);
 
 // 프론트엔드 웹 UI 프로젝트 추가하기

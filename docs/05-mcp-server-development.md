@@ -363,13 +363,15 @@ save-points/
 
     ```bash
     # zsh/bash
-    mkdir -p $REPOSITORY_ROOT/workshop && \
+    rm -rf $REPOSITORY_ROOT/workshop && \
+        mkdir -p $REPOSITORY_ROOT/workshop && \
         cp -a $REPOSITORY_ROOT/save-points/step-05/complete/. $REPOSITORY_ROOT/workshop/
     ```
 
     ```powershell
     # PowerShell
-    New-Item -Type Directory -Path $REPOSITORY_ROOT/workshop -Force && `
+    Remove-Item -Path $REPOSITORY_ROOT/workshop -Recurse -Force && `
+        New-Item -Type Directory -Path $REPOSITORY_ROOT/workshop -Force && `
         Copy-Item -Path $REPOSITORY_ROOT/save-points/step-05/complete/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
     ```
 

@@ -1,12 +1,10 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 // MCP Todo 서버 프로젝트 추가하기
-var mcptodo = builder.AddProject<Projects.MafWorkshop_McpTodo>("mcptodo")
-                     .WithExternalHttpEndpoints();
+var mcptodo = builder.AddProject<Projects.MafWorkshop_McpTodo>("mcptodo");
 
 // 백엔드 에이전트 프로젝트 수정하기
 var agent = builder.AddProject<Projects.MafWorkshop_Agent>("agent")
-                   .WithExternalHttpEndpoints()
                    .WithLlmReference(builder.Configuration, args)
                    .WithReference(mcptodo)
                    .WaitFor(mcptodo);

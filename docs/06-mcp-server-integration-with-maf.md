@@ -174,8 +174,7 @@ save-points/
 
     ```csharp
     // MCP Todo 서버 프로젝트 추가하기
-    var mcptodo = builder.AddProject<Projects.MafWorkshop_McpTodo>("mcptodo")
-                         .WithExternalHttpEndpoints();
+    var mcptodo = builder.AddProject<Projects.MafWorkshop_McpTodo>("mcptodo");
     ```
 
 1. 같은 파일에서 `// 백엔드 에이전트 프로젝트 수정하기` 주석을 찾아 아래와 같이 변경합니다. 백엔드 에이전트 리소스인 `agent`에 방금 작성한 `mcptodo` 리소스를 연결합니다.
@@ -185,7 +184,6 @@ save-points/
     ```csharp
     // 백엔드 에이전트 프로젝트 수정하기
     var agent = builder.AddProject<Projects.MafWorkshop_Agent>("agent")
-                       .WithExternalHttpEndpoints()
                        .WithLlmReference(builder.Configuration, args);
     ```
 
@@ -194,7 +192,6 @@ save-points/
     ```csharp
     // 백엔드 에이전트 프로젝트 수정하기
     var agent = builder.AddProject<Projects.MafWorkshop_Agent>("agent")
-                       .WithExternalHttpEndpoints()
                        .WithLlmReference(builder.Configuration, args)
                        .WithReference(mcptodo)
                        .WaitFor(mcptodo);
@@ -371,13 +368,15 @@ save-points/
 
     ```bash
     # zsh/bash
-    mkdir -p $REPOSITORY_ROOT/workshop && \
+    rm -rf $REPOSITORY_ROOT/workshop && \
+        mkdir -p $REPOSITORY_ROOT/workshop && \
         cp -a $REPOSITORY_ROOT/save-points/step-06/complete/. $REPOSITORY_ROOT/workshop/
     ```
 
     ```powershell
     # PowerShell
-    New-Item -Type Directory -Path $REPOSITORY_ROOT/workshop -Force && `
+    Remove-Item -Path $REPOSITORY_ROOT/workshop -Recurse -Force && `
+        New-Item -Type Directory -Path $REPOSITORY_ROOT/workshop -Force && `
         Copy-Item -Path $REPOSITORY_ROOT/save-points/step-06/complete/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
     ```
 

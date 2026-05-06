@@ -316,7 +316,6 @@ save-points/
     ```csharp
     // 백엔드 에이전트 프로젝트 추가하기
     var agent = builder.AddProject<Projects.MafWorkshop_Agent>("agent")
-                       .WithExternalHttpEndpoints()
                        .WithLlmReference(builder.Configuration, args);
     ```
 
@@ -325,9 +324,9 @@ save-points/
     ```csharp
     // 프론트엔드 웹 UI 프로젝트 추가하기
     var webUI = builder.AddProject<Projects.MafWorkshop_WebUI>("webui")
-                        .WithExternalHttpEndpoints()
-                        .WithReference(agent)
-                        .WaitFor(agent);
+                       .WithExternalHttpEndpoints()
+                       .WithReference(agent)
+                       .WaitFor(agent);
     ```
 
 ## Aspire 오케스트레이션 구성 - 백엔드 에이전트
@@ -517,13 +516,15 @@ save-points/
 
     ```bash
     # zsh/bash
-    mkdir -p $REPOSITORY_ROOT/workshop && \
+    rm -rf $REPOSITORY_ROOT/workshop && \
+        mkdir -p $REPOSITORY_ROOT/workshop && \
         cp -a $REPOSITORY_ROOT/save-points/step-04/complete/. $REPOSITORY_ROOT/workshop/
     ```
 
     ```powershell
     # PowerShell
-    New-Item -Type Directory -Path $REPOSITORY_ROOT/workshop -Force && `
+    Remove-Item -Path $REPOSITORY_ROOT/workshop -Recurse -Force && `
+        New-Item -Type Directory -Path $REPOSITORY_ROOT/workshop -Force && `
         Copy-Item -Path $REPOSITORY_ROOT/save-points/step-04/complete/* -Destination $REPOSITORY_ROOT/workshop -Recurse -Force
     ```
 
